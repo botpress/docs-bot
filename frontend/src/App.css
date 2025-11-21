@@ -1,42 +1,97 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Your CSS styles here */
+
+.bpMessageAvatarContainer {
+  display: none !important;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.bpContainer {
+  border-radius: 0 !important;
+  border-top: none;
+  border-bottom: none;
+  border-right: none;
+  border-left: none
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.bpHeaderContainer {
+  background-color: inherit;
+}
+
+.bpComposerContainer {
+  margin-bottom: var(--bpSpacing-2);
+  transition-duration: 0s
+}
+
+.bpHeaderContainer {
+  transition-duration: 0s;
+}
+
+.bpComposerFooter {
+  display: none;
+}
+
+.bpMessageListMarqueeContainer {
+  visibility: hidden;
+}
+
+.bpTypingIndicatorContainer {
+  padding: var(--bpSpacing-2) var(--bpSpacing-4);
+  background-color: transparent;
+}
+
+.bpMessageBlocksBubble[data-direction="incoming"] {
+  max-width: 100%;
+  background-color: transparent;
+}
+
+.bpMessageBlocksRow {
+  padding: var(--bpSpacing-2) var(--bpSpacing-4)
+}
+
+.bpMessageListViewport {
+  padding-left: 0rem;
+}
+
+:host,
+:root {
+  color-scheme: inherit;
+}
+
+.bpMessageBlocksBubble[data-direction=outgoing] {
+  background-color: #ffffff;
+  border: 1px solid var(--bpGray-200);
+  color: var(--bpGray-900)
+}
+/* 
+.bpComposerFooter {
+  display: none;
+} */
+
+:root {
+  --bpGray-1: #f7f7f8;
+  --bpGray-100: transparent;
+  --button-bg: #0588f0;
+  --button-text: #ffffff
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --button-bg: #0588f0;
+    --bpGray-1: #09090b;
+    --bpGray-50: #15161A;
+    --bpGray-100: #2b2b2b;
+    --bpGray-200: #2F323B;
+    --bpGray-300: #3F434F;
+    --bpGray-400: #5F6476;
+    --bpGray-500: #696F83;
+    --bpGray-600: #969AA8;
+    --bpGray-700: #C3C5CD;
+    --bpGray-800: #DADBE0;
+    --bpGray-900: #F0F1F3;
+    --bpGray-950: #F8F8F9;
   }
-  to {
-    transform: rotate(360deg);
+
+  .bpMessageBlocksBubble[data-direction=outgoing] {
+    background-color: #1a1a1a;
+    color: var(--bpPrimary-50)
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
