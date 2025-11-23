@@ -1,5 +1,6 @@
 import { Container, Header, MessageList, Composer, useWebchat } from '@botpress/webchat'
-import { useMemo } from 'react'
+import type { IntegrationMessage } from '@botpress/webchat'
+import { useMemo, useState } from 'react'
 import './App.css'
 
 const headerConfig = {
@@ -9,6 +10,8 @@ const headerConfig = {
 }
 
 function App() {
+const [context, setContext] = useState([])
+
   const { client, messages, isTyping, user, clientState, newConversation } = useWebchat({
     clientId: import.meta.env.VITE_AGENT_CLIENT_ID
   })
@@ -18,6 +21,7 @@ function App() {
     botAvatar: 'https://files.bpcontent.cloud/2025/11/19/21/20251119210301-2SLGBPIY.png',
     botDescription: 'Ask a question about the documentation. Powered by Botpress.',
   }
+
   const enrichedMessages = useMemo(
   () =>
     messages.map((message) => {
@@ -34,6 +38,17 @@ function App() {
     }),
   [config.botAvatar, config.botName, messages, user?.userId]
   )
+
+  const sendMessage = async (payload: IntegrationMessage['payload']) => {
+    if (payload.type === 'text') {
+      await client?.sendMessage({
+        ...payload,
+        value: JSON.stringify({context}),
+      })
+    } else {
+      await client?.sendMessage(payload)
+    }
+  }
 
   return (
     <>
@@ -58,14 +73,14 @@ function App() {
         isTyping={isTyping}
         showMarquee={false}
         messages={enrichedMessages}
-        sendMessage={client?.sendMessage}
+        sendMessage={sendMessage}
       />
       <Composer
         disableComposer={false}
         isReadOnly={false}
         allowFileUpload={true}
         connected={clientState !== 'disconnected'}
-        sendMessage={client?.sendMessage}
+        sendMessage={sendMessage}
         uploadFile={client?.uploadFile}
         composerPlaceholder="Type a message..."
       />

@@ -1,8 +1,8 @@
-/**
- * TODO: Add your workflows here
- *
- * This is a placeholder file to initialize the workflows directory.
- * You can delete this file once you add your own workflows.
- */
+import { Workflow} from "@botpress/runtime";
+import { KnowledgeDocs } from "../knowledge";
 
-export default {};
+export const IndexKnowledgeWorkflow = new Workflow({
+  name: "indexKnowledge",
+  schedule: "0 0 * * *", // Daily at midnight
+  handler: async () => await KnowledgeDocs.refresh({force: true}),
+});
