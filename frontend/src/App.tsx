@@ -12,7 +12,10 @@ const headerConfig = {
 
 function App() {
   const [currentContext, setCurrentContext] = useState<Array<{ title: string; path: string }>>([])
+  const [suggestedContext, setSuggestedContext] = useState<{ title: string; path: string } | null>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const lastSentMessagePath = useRef<string | null>(null)
+  const currentPagePath = useRef<string | null>(null)
 
   const { client, messages, isTyping, user, clientState, newConversation } = useWebchat({
     clientId: import.meta.env.VITE_DEV_CLIENT_ID
@@ -28,6 +31,7 @@ function App() {
           }
           return prev
         })
+        setSuggestedContext(null)
       }
       
       if (event.data.type === 'focusInput') {
@@ -42,11 +46,49 @@ function App() {
           text: event.data.message,
         })
       }
+
+      if (event.data.type === 'panelOpened' && event.data.data?.path && event.data.data?.title) {
+        const isLandingPage = event.data.data.path === '/' || 
+                             event.data.data.path === '/index' || 
+                             event.data.data.path.endsWith('/index.html')
+        
+        currentPagePath.current = event.data.data.path
+        const isNewPath = lastSentMessagePath.current !== event.data.data.path
+        
+        if (!isLandingPage && currentContext.length === 0 && isNewPath) {
+          const alreadyInContext = currentContext.some(item => item.path === event.data.data.path)
+          if (!alreadyInContext) {
+            setSuggestedContext({ title: event.data.data.title, path: event.data.data.path })
+          } else {
+            setSuggestedContext(null)
+          }
+        } else {
+          setSuggestedContext(null)
+        }
+      }
+
+      if (event.data.type === 'pageChanged' && event.data.data?.path && event.data.data?.title) {
+        const isLandingPage = event.data.data.path === '/' || 
+                             event.data.data.path === '/index' || 
+                             event.data.data.path.endsWith('/index.html')
+        
+        currentPagePath.current = event.data.data.path
+        
+        lastSentMessagePath.current = null
+        
+        if (!isLandingPage && currentContext.length === 0) {
+          setSuggestedContext({ title: event.data.data.title, path: event.data.data.path })
+        } else if (currentContext.length > 0) {
+          setSuggestedContext(null)
+        } else {
+          setSuggestedContext(null)
+        }
+      }
     }
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [client])
+  }, [client, currentContext])
 
   useEffect(() => {
     const handleKeyboardShortcut = (e: KeyboardEvent) => {
@@ -97,11 +139,33 @@ function App() {
         ...payload,
         value: JSON.stringify({currentContext}),
       })
+      
+      // If message was sent with context, remember the current path
+      if (currentContext.length > 0) {
+        lastSentMessagePath.current = currentPagePath.current
+      }
     } else {
       await client?.sendMessage(payload)
     }
     setCurrentContext([])
+    setSuggestedContext(null)
   }
+
+  const addSuggestedContext = () => {
+    if (suggestedContext) {
+      setCurrentContext([...currentContext, suggestedContext])
+      setSuggestedContext(null)
+      inputRef.current?.focus()
+    }
+  }
+
+  useEffect(() => {
+    if (currentContext.length === 0) {
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'requestCurrentPage' }, '*')
+      }
+    }
+  }, [currentContext.length])
 
   return (
     <>
@@ -136,7 +200,12 @@ function App() {
         composerPlaceholder="Ask a question..."
         inputRef={inputRef}
       >
-        <Context currentContext={currentContext} setCurrentContext={setCurrentContext}/>
+        <Context 
+          currentContext={currentContext} 
+          setCurrentContext={setCurrentContext}
+          suggestedContext={suggestedContext}
+          addSuggestedContext={addSuggestedContext}
+        />
       </Composer>
     </Container>
     <StylesheetProvider radius={1.5} fontFamily='Inter' variant='solid' />
