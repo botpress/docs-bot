@@ -2,9 +2,24 @@ import { Conversation, actions, z } from "@botpress/runtime";
 import { KnowledgeDocs } from "../knowledge";
 
 export default new Conversation({
-  channel: "*",
-  handler: async ({execute, state, message}) => {
-    state.context = JSON.parse(message.payload.value).currentContext.path
+  channel: ["webchat.channel"],
+  handler: async ({execute, state, message, conversation}) => {
+    if (message?.payload && 'type' in message.payload && message.payload.type === 'text' && 'value' in message.payload && message.payload.value) {
+      const parsed = JSON.parse(message.payload.value)
+      const contextToAdd = parsed.currentContext?.map((item: { title: string; path: string }) => item.path) || []
+
+      if (contextToAdd.length > 0) {
+        console.log(contextToAdd)
+        state.context = contextToAdd
+      }
+    }
+
+    if (message) {
+      actions.webchat.startTypingIndicator({
+        conversationId: conversation.id,
+        messageId: message?.id
+      })
+    }
 
     await execute({
       instructions: `
@@ -16,6 +31,15 @@ Always include a **Sources** section at the bottom of your answer with markdown 
 `,
       knowledge: [KnowledgeDocs],
     });
+
+    if (message) {
+      actions.webchat.stopTypingIndicator({
+        conversationId: conversation.id,
+        messageId: message?.id
+      })
+    }
+
+    state.context = []
   },
   state: z.object({
     context: z.array(z.string())

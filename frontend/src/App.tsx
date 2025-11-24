@@ -1,6 +1,6 @@
 import { Container, Header, MessageList, Composer, useWebchat, StylesheetProvider } from '@botpress/webchat'
 import type { IntegrationMessage } from '@botpress/webchat'
-import Context from './components/context'
+import Context from './components/Context'
 import { useMemo, useState, useEffect, useRef } from 'react'
 import './App.css'
 
@@ -15,10 +15,8 @@ function App() {
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const { client, messages, isTyping, user, clientState, newConversation } = useWebchat({
-    clientId: import.meta.env.VITE_AGENT_CLIENT_ID
+    clientId: import.meta.env.VITE_DEV_CLIENT_ID
   })
-
-  console.log(isTyping)
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -102,7 +100,7 @@ function App() {
     } else {
       await client?.sendMessage(payload)
     }
-    // setCurrentContext([])
+    setCurrentContext([])
   }
 
   return (
