@@ -29,6 +29,10 @@
   display: none;
 }
 
+.bpComposerFileAttachement {
+  background-color: #ffffff
+}
+
 .bpMessageListMarqueeContainer {
   visibility: hidden;
 }
@@ -66,7 +70,7 @@
   display: none;
 } */
 
-:root {
+:root .bpReset {
   --bpGray-1: #f7f7f8;
   --bpGray-100: transparent;
   --button-bg: #0588f0;
@@ -74,9 +78,9 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root .bpReset {
     --button-bg: #0588f0;
-    --bpGray-1: #09090b;
+    --bpGray-1: #09090b !important;
     --bpGray-50: #15161A;
     --bpGray-100: #2b2b2b;
     --bpGray-200: #2F323B;
@@ -93,5 +97,9 @@
   .bpMessageBlocksBubble[data-direction=outgoing] {
     background-color: #1a1a1a;
     color: var(--bpPrimary-50)
+  }
+
+  .bpComposerFileAttachement {
+    background-color: var(--bpGray-1)
   }
 }
