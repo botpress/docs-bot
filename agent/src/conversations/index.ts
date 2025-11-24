@@ -4,7 +4,7 @@ import { KnowledgeDocs } from "../knowledge";
 export default new Conversation({
   channel: "*",
   handler: async ({execute, state, message}) => {
-    state.context = JSON.parse(message.payload.value).context
+    state.context = JSON.parse(message.payload.value).currentContext.path
 
     await execute({
       instructions: `
@@ -14,10 +14,8 @@ If there are any pages in ${state.context}, prioritize them when generating your
 
 Always include a **Sources** section at the bottom of your answer with markdown links to all the pages you used to answer the question (the link preview should just be the title of the page).
 `,
-      knowledge: [KnowledgeDocs]
+      knowledge: [KnowledgeDocs],
     });
-
-    state.context = []
   },
   state: z.object({
     context: z.array(z.string())

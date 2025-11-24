@@ -1,7 +1,7 @@
 import { Container, Header, MessageList, Composer, useWebchat, StylesheetProvider } from '@botpress/webchat'
 import type { IntegrationMessage } from '@botpress/webchat'
 import Context from './components/context'
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import './App.css'
 
 const headerConfig = {
@@ -12,10 +12,13 @@ const headerConfig = {
 
 function App() {
   const [currentContext, setCurrentContext] = useState<Array<{ title: string; path: string }>>([])
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const { client, messages, isTyping, user, clientState, newConversation } = useWebchat({
     clientId: import.meta.env.VITE_AGENT_CLIENT_ID
   })
+
+  console.log(isTyping)
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -28,10 +31,43 @@ function App() {
           return prev
         })
       }
+      
+      if (event.data.type === 'focusInput') {
+        setTimeout(() => {
+          inputRef.current?.focus()
+        }, 100)
+      }
+
+      if (event.data.type === 'sendMessage' && event.data.message) {
+        client?.sendMessage({
+          type: 'text',
+          text: event.data.message,
+        })
+      }
     }
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
+  }, [client])
+
+  useEffect(() => {
+    const handleKeyboardShortcut = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+      const modifierKey = isMac ? e.metaKey : e.ctrlKey
+      
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        window.parent.postMessage({ type: 'closePanel' }, '*')
+      }
+
+      if (modifierKey && e.key === 'i' && !e.shiftKey && !e.altKey) {
+        e.preventDefault()
+        window.parent.postMessage({ type: 'togglePanel' }, '*')
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyboardShortcut)
+    return () => window.removeEventListener('keydown', handleKeyboardShortcut)
   }, [])
 
   const config = {
@@ -66,7 +102,7 @@ function App() {
     } else {
       await client?.sendMessage(payload)
     }
-    setCurrentContext([])
+    // setCurrentContext([])
   }
 
   return (
@@ -93,6 +129,7 @@ function App() {
         messages={enrichedMessages}
         sendMessage={sendMessage}
       />
+      <div>test</div>
       <Composer
         disableComposer={false}
         isReadOnly={false}
@@ -100,11 +137,12 @@ function App() {
         connected={clientState !== 'disconnected'}
         sendMessage={sendMessage}
         composerPlaceholder="Ask a question..."
+        inputRef={inputRef}
       >
         <Context currentContext={currentContext} setCurrentContext={setCurrentContext}/>
       </Composer>
     </Container>
-    <StylesheetProvider radius={1.5} fontFamily='Inter'/>
+    <StylesheetProvider radius={1.5} fontFamily='Inter' variant='solid' />
     </>
   )
 }
