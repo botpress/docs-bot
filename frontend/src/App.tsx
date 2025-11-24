@@ -129,7 +129,6 @@ function App() {
         messages={enrichedMessages}
         sendMessage={sendMessage}
       />
-      <div>test</div>
       <Composer
         disableComposer={false}
         isReadOnly={false}
