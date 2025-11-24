@@ -12,17 +12,18 @@
   border-left: none
 }
 
+button:hover {
+  border-color: transparent
+}
+
 .bpHeaderContainer {
   background-color: inherit;
+  transition-duration: 0s;
 }
 
 .bpComposerContainer {
   margin-bottom: var(--bpSpacing-2);
   transition-duration: 0s
-}
-
-.bpHeaderContainer {
-  transition-duration: 0s;
 }
 
 .bpComposerFooter {
@@ -55,6 +56,10 @@
   padding-left: 0rem;
 }
 
+.bpHeaderContentDescription {
+  font-weight: 400;
+}
+
 :host,
 :root {
   color-scheme: inherit;
@@ -65,16 +70,17 @@
   border: 1px solid var(--bpGray-200);
   color: var(--bpGray-900)
 }
-/* 
-.bpComposerFooter {
-  display: none;
-} */
+
+.bpMessageBlocksTextCode {
+  font-size: calc(var(--bpFontSize-scale) * var(--bpFontSize-sm));
+}
 
 :root .bpReset {
   --bpGray-1: #f7f7f8;
   --bpGray-100: transparent;
   --button-bg: #0588f0;
-  --button-text: #ffffff
+  --button-text: #ffffff;
+  font-weight: 400 !important
 }
 
 @media (prefers-color-scheme: dark) {
