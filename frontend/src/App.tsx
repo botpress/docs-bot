@@ -33,7 +33,7 @@ function App() {
 
   const { client, messages, isTyping, user, clientState, newConversation } =
     useWebchat({
-      clientId: import.meta.env.VITE_DEV_CLIENT_ID,
+      clientId: import.meta.env.VITE_PROD_CLIENT_ID,
     });
 
   const { lastSentMessagePathRef, currentPagePathRef } = useParentWindowMessages({
