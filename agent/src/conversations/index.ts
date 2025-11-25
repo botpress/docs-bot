@@ -3,21 +3,29 @@ import { KnowledgeDocs } from "../knowledge/docs";
 
 export default new Conversation({
   channel: ["webchat.channel"],
-  handler: async ({execute, state, message, conversation}) => {
-
-    if (message?.payload && 'type' in message.payload && message.payload.type === 'text' && 'value' in message.payload && message.payload.value) {
-      const parsed = JSON.parse(message.payload.value)
-      const contextToAdd = parsed.currentContext?.map((item: { title: string; path: string }) => item.path) || []
+  handler: async ({ execute, state, message, conversation }) => {
+    if (
+      message?.payload &&
+      "type" in message.payload &&
+      message.payload.type === "text" &&
+      "value" in message.payload &&
+      message.payload.value
+    ) {
+      const parsed = JSON.parse(message.payload.value);
+      const contextToAdd =
+        parsed.currentContext?.map(
+          (item: { title: string; path: string }) => item.path
+        ) || [];
 
       if (contextToAdd.length > 0) {
-        state.context = contextToAdd
+        state.context = contextToAdd;
         conversation.send({
           type: "custom",
           payload: {
             url: "",
             name: `Reading context...`,
-          }
-        })
+          },
+        });
       } else {
         conversation.send({
           type: "custom",
@@ -25,7 +33,7 @@ export default new Conversation({
             url: "",
             name: "Thinking...",
           },
-        })
+        });
       }
     }
 
@@ -48,16 +56,16 @@ Never use inline citations.
               payload: {
                 url: "",
                 name: `Searching documentation...`,
-              }
-            })
+              },
+            });
           }
         },
-      }
+      },
     });
 
-    state.context = []
+    state.context = [];
   },
   state: z.object({
-    context: z.array(z.string())
-  })
+    context: z.array(z.string()),
+  }),
 });
