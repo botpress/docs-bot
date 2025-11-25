@@ -10,7 +10,7 @@ import Context from "./components/Context";
 import CustomTextRenderer from "./components/CustomTextRenderer";
 import ModelSelector from "./components/ModelSelector";
 import { DEFAULT_MODEL } from "./config/models";
-import { BOT_CONFIG } from "./config/constants";
+import { BOT_CONFIG, CLIENT_ID } from "./config/constants";
 import { useState } from "react";
 import { useContextManagement } from "./hooks/useContextManagement";
 import { useParentWindowMessages } from "./hooks/useParentWindowMessages";
@@ -33,7 +33,7 @@ function App() {
 
   const { client, messages, isTyping, user, clientState, newConversation } =
     useWebchat({
-      clientId: import.meta.env.VITE_PROD_CLIENT_ID,
+      clientId: CLIENT_ID,
     });
 
   const { lastSentMessagePathRef, currentPagePathRef } = useParentWindowMessages({

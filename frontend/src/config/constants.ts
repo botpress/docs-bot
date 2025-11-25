@@ -13,3 +13,4 @@ export const COLORS = {
 
 export const PARENT_ORIGIN = "https://botpress.com" as const;
 
+export const CLIENT_ID = "5b5e1c06-97c3-4c78-b9cc-ca8fb166c782" as const
