@@ -17,7 +17,7 @@ const Context = ({
   return (
     <>
       {(currentContext.length > 0 || suggestedContext) && (
-        <div className="bpComposerFileContainer">
+        <div className="bpComposerFileContainer" style={{display: "block", overflowX: "hidden"}}>
           {suggestedContext && currentContext.length === 0 && (
             <div
               className="bpComposerFileAttachement"
@@ -26,18 +26,22 @@ const Context = ({
                 backgroundColor: "transparent",
                 border: "1.5px dashed var(--bpGray-400)",
                 cursor: "pointer",
+                width: "auto",
+                padding: "var(--bpSpacing-2)",
+                marginBottom: "var(--bpSpacing-1)",
               }}
             >
               <div
                 style={{
-                  minWidth: "96px",
-                  whiteSpace: "nowrap",
-                  textOverflow: "ellipsis",
+                  // minWidth: "96px",
+                  flexDirection: "column",
                   lineHeight:
                     "calc(var(--bpFontSize-scale) * var(--bpFontSize-lg))",
                   fontSize:
                     "calc(var(--bpFontSize-scale) * var(--bpFontSize-sm))",
                   color: "var(--bpGray-600)",
+                  flex: 1,
+                  overflow: "hidden",
                 }}
               >
                 <div
@@ -46,6 +50,7 @@ const Context = ({
                     maxWidth: "none",
                     color: "var(--bpGray-600)",
                     fontWeight: "600",
+
                   }}
                 >
                   {suggestedContext.title}
@@ -86,12 +91,15 @@ const Context = ({
               style={{
                 backgroundColor: "rgb(0 144 255/.1)",
                 border: "none",
+                padding: "var(--bpSpacing-2)",
+                marginBottom: "var(--bpSpacing-1)",
+                width: "auto"
               }}
             >
               <div
                 style={{
                   minWidth: "96px",
-                  whiteSpace: "nowrap",
+                  flexDirection: "column",
                   textOverflow: "ellipsis",
                   lineHeight:
                     "calc(var(--bpFontSize-scale) * var(--bpFontSize-lg))",

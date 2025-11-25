@@ -9,10 +9,12 @@ import {
 import type { IntegrationMessage } from "@botpress/webchat";
 import Context from "./components/Context";
 import CustomTextRenderer from "./components/CustomTextRenderer";
+import ModelSelector from "./components/ModelSelector";
+import { DEFAULT_MODEL } from "./config/models";
 import { useMemo, useState, useEffect, useRef } from "react";
 import "./App.css";
 
-const headerConfig = {
+const config = {
   botName: "Assistant",
   botAvatar:
     "https://files.bpcontent.cloud/2025/11/19/21/20251119210301-2SLGBPIY.png",
@@ -28,6 +30,7 @@ function App() {
     title: string;
     path: string;
   } | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODEL.id);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const lastSentMessagePath = useRef<string | null>(null);
   const currentPagePath = useRef<string | null>(null);
@@ -146,14 +149,6 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeyboardShortcut);
   }, []);
 
-  const config = {
-    botName: "Assistant",
-    botAvatar:
-      "https://files.bpcontent.cloud/2025/11/19/21/20251119210301-2SLGBPIY.png",
-    botDescription:
-      "Ask AI a question about the documentation. Powered by Botpress.",
-  };
-
   const enrichedMessages = useMemo(() => {
     const allEnriched = messages.map((message) => {
       const { authorId } = message;
@@ -192,7 +187,10 @@ function App() {
     if (payload.type === "text") {
       await client?.sendMessage({
         ...payload,
-        value: JSON.stringify({ currentContext }),
+        value: JSON.stringify({ 
+          currentContext, 
+          model: selectedModel || "auto"
+        }),
       });
 
       // If message was sent with context, remember the current path
@@ -236,7 +234,7 @@ function App() {
           defaultOpen={false}
           restartConversation={newConversation}
           disabled={false}
-          configuration={headerConfig}
+          configuration={config}
         />
         <MessageList
           botName={config.botName}
@@ -258,12 +256,18 @@ function App() {
           composerPlaceholder="Ask a question..."
           inputRef={inputRef}
         >
-          <Context
-            currentContext={currentContext}
-            setCurrentContext={setCurrentContext}
-            suggestedContext={suggestedContext}
-            addSuggestedContext={addSuggestedContext}
-          />
+          <div className="composer-top-row">
+            <Context
+              currentContext={currentContext}
+              setCurrentContext={setCurrentContext}
+              suggestedContext={suggestedContext}
+              addSuggestedContext={addSuggestedContext}
+            />
+            <ModelSelector
+              selectedModel={selectedModel}
+              onModelChange={setSelectedModel}
+            />
+          </div>
         </Composer>
       </Container>
       <StylesheetProvider

@@ -23,7 +23,18 @@ button:hover {
 
 .bpComposerContainer {
   margin-bottom: var(--bpSpacing-2);
-  transition-duration: 0s
+  transition-duration: 0s;
+  position: relative;
+}
+
+.composer-top-row {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+}
+
+.composer-top-row .model-selector {
+  margin-left: auto;
 }
 
 .bpComposerFooter {
