@@ -1,43 +1,59 @@
 import { Conversation, actions, z } from "@botpress/runtime";
-import { KnowledgeDocs } from "../knowledge";
+import { KnowledgeDocs } from "../knowledge/docs";
 
 export default new Conversation({
   channel: ["webchat.channel"],
   handler: async ({execute, state, message, conversation}) => {
+
     if (message?.payload && 'type' in message.payload && message.payload.type === 'text' && 'value' in message.payload && message.payload.value) {
       const parsed = JSON.parse(message.payload.value)
       const contextToAdd = parsed.currentContext?.map((item: { title: string; path: string }) => item.path) || []
 
       if (contextToAdd.length > 0) {
-        console.log(contextToAdd)
         state.context = contextToAdd
+        conversation.send({
+          type: "custom",
+          payload: {
+            url: "",
+            name: `Reading context...`,
+          }
+        })
+      } else {
+        conversation.send({
+          type: "custom",
+          payload: {
+            url: "",
+            name: "Thinking...",
+          },
+        })
       }
-    }
-
-    if (message) {
-      actions.webchat.startTypingIndicator({
-        conversationId: conversation.id,
-        messageId: message?.id
-      })
     }
 
     await execute({
       instructions: `
-You are the AI Assistant for the Botpress documentation. Give accurate answers to all user questions. Use markdown and subheadings to format your answers (use code blocks for code).
+You are the AI Assistant for the Botpress documentation. Give accurate answers to all user questions. Use markdown to format your answers (use code blocks for code).
 
 If there are any pages in ${state.context}, prioritize them when generating your answer.
 
-Always include a **Sources** section at the bottom of your answer with markdown links to all the pages you used to answer the question (the link preview should just be the title of the page).
+Always include a **Sources** section at the bottom of your answe r with markdown links to all the pages you used to answer the question (the link preview should just be the title of the page).
+
+Never use inline citations.
 `,
       knowledge: [KnowledgeDocs],
+      hooks: {
+        onBeforeTool: async (event) => {
+          if (event.tool.name === "search_knowledge") {
+            conversation.send({
+              type: "custom",
+              payload: {
+                url: "",
+                name: `Searching documentation...`,
+              }
+            })
+          }
+        },
+      }
     });
-
-    if (message) {
-      actions.webchat.stopTypingIndicator({
-        conversationId: conversation.id,
-        messageId: message?.id
-      })
-    }
 
     state.context = []
   },

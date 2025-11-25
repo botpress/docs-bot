@@ -1,6 +1,7 @@
 import { Container, Header, MessageList, Composer, useWebchat, StylesheetProvider } from '@botpress/webchat'
 import type { IntegrationMessage } from '@botpress/webchat'
 import Context from './components/Context'
+import CustomTextRenderer from './components/CustomTextRenderer'
 import { useMemo, useState, useEffect, useRef } from 'react'
 import './App.css'
 
@@ -117,8 +118,8 @@ function App() {
   }
 
   const enrichedMessages = useMemo(
-  () =>
-    messages.map((message) => {
+  () => {
+    const allEnriched = messages.map((message) => {
       const { authorId } = message
       const direction: 'outgoing' | 'incoming' = authorId === user?.userId ? 'outgoing' : 'incoming'
       return {
@@ -129,9 +130,24 @@ function App() {
             ? { name: 'You', avatar: undefined }
             : { name: config.botName ?? 'Bot', avatar: config.botAvatar },
       }
-    }),
+    })
+
+    const incomingMessages = allEnriched.filter(m => m.direction === 'incoming')
+    const latestIncoming = incomingMessages.length > 0 ? incomingMessages[incomingMessages.length - 1] : null
+    const latestIsCustom = latestIncoming?.block.type === 'custom'
+
+    // Filter: keep all non-custom messages, and only the latest custom message if it's the most recent incoming.
+    // we do this to display status updates
+    return allEnriched.filter((msg) => {
+      if (msg.block.type !== 'custom') {
+        return true
+      }
+      return latestIsCustom && msg.id === latestIncoming?.id
+    })
+  },
   [config.botAvatar, config.botName, messages, user?.userId]
   )
+
 
   const sendMessage = async (payload: IntegrationMessage['payload']) => {
     if (payload.type === 'text') {
@@ -190,6 +206,9 @@ function App() {
         showMarquee={true}
         messages={enrichedMessages}
         sendMessage={sendMessage}
+        renderers={{
+          custom: CustomTextRenderer
+        }}
       />
       <Composer
         disableComposer={false}
@@ -208,7 +227,7 @@ function App() {
         />
       </Composer>
     </Container>
-    <StylesheetProvider radius={1.5} fontFamily='Inter' variant='solid' />
+    <StylesheetProvider radius={1.5} fontFamily='Inter' variant='solid' color='#0090FF'/>
     </>
   )
 }

@@ -60,6 +60,10 @@ button:hover {
   font-weight: 400;
 }
 
+.bpModalButtonConfirm {
+  color: var(--bpPrimary-50)
+}
+
 :host,
 :root {
   color-scheme: inherit;
@@ -107,5 +111,47 @@ button:hover {
 
   .bpComposerFileAttachement {
     background-color: var(--bpGray-1)
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #5f6276 0%,
+    #9097a8 45%,
+    #c5c9d6 50%,
+    #9097a8 55%,
+    #5f6276 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 5s linear infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  .shimmer-text {
+    background: linear-gradient(
+      90deg,
+      #969aa8 0%,
+      #c3c5cd 45%,
+      #e8e9ec 50%,
+      #c3c5cd 55%,
+      #969aa8 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }

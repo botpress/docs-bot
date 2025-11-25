@@ -1,6 +1,8 @@
 import { DataSource, Knowledge } from "@botpress/runtime";
 
-const BotpressDocsSource = DataSource.Website.fromUrls(["https://botpress.com/docs/llms-full.txt"]);
+const BotpressDocsSource = DataSource.Website.fromSitemap(
+  "https://www.botpress.com/docs/sitemap.xml"
+);
 
 export const KnowledgeDocs = new Knowledge({
   name: "botpress-docs",
