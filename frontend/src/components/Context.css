@@ -1,0 +1,72 @@
+.context-container {
+  display: block;
+  overflow-x: hidden;
+}
+
+.context-suggested {
+  background-color: transparent;
+  border: 1.5px dashed var(--bpGray-400);
+  cursor: pointer;
+  width: auto;
+  padding: var(--bpSpacing-2);
+  margin-bottom: var(--bpSpacing-1);
+}
+
+.context-item-content {
+  flex-direction: column;
+  line-height: calc(var(--bpFontSize-scale) * var(--bpFontSize-lg));
+  font-size: calc(var(--bpFontSize-scale) * var(--bpFontSize-sm));
+  color: var(--bpGray-600);
+  flex: 1;
+  overflow: hidden;
+}
+
+.context-suggested .context-title {
+  max-width: none;
+  color: var(--bpGray-600);
+  font-weight: 600;
+}
+
+.context-suggested .context-path {
+  font-weight: 400;
+  color: var(--bpGray-500);
+}
+
+.context-suggested .context-icon {
+  color: var(--bpGray-600);
+}
+
+.context-active {
+  background-color: rgb(0 144 255/.1);
+  border: none;
+  padding: var(--bpSpacing-2);
+  margin-bottom: var(--bpSpacing-1);
+  width: auto;
+}
+
+.context-active .context-item-content {
+  min-width: 96px;
+  text-overflow: ellipsis;
+  color: var(--bpGray-900);
+}
+
+.context-active .context-title {
+  max-width: none;
+  color: rgb(0 144 255/1);
+  font-weight: 600;
+}
+
+.context-active .context-path {
+  font-weight: 400;
+}
+
+.context-remove-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

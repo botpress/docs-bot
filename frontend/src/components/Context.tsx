@@ -1,3 +1,7 @@
+import PlusIcon from "./icons/PlusIcon";
+import CloseIcon from "./icons/CloseIcon";
+import "./Context.css";
+
 interface ContextProps {
   currentContext: Array<{ title: string; path: string }>;
   setCurrentContext: (value: Array<{ title: string; path: string }>) => void;
@@ -14,137 +18,67 @@ const Context = ({
   const removeContext = (indexToRemove: number) => {
     setCurrentContext(currentContext.filter((_, i) => i !== indexToRemove));
   };
+
+  const handleAddKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      addSuggestedContext?.();
+    }
+  };
+
+  const handleRemoveKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      removeContext(index);
+    }
+  };
+
   return (
     <>
       {(currentContext.length > 0 || suggestedContext) && (
-        <div className="bpComposerFileContainer" style={{display: "block", overflowX: "hidden"}}>
+        <div className="bpComposerFileContainer context-container">
           {suggestedContext && currentContext.length === 0 && (
             <div
-              className="bpComposerFileAttachement"
+              className="bpComposerFileAttachement context-suggested"
               onClick={addSuggestedContext}
-              style={{
-                backgroundColor: "transparent",
-                border: "1.5px dashed var(--bpGray-400)",
-                cursor: "pointer",
-                width: "auto",
-                padding: "var(--bpSpacing-2)",
-                marginBottom: "var(--bpSpacing-1)",
-              }}
+              onKeyDown={handleAddKeyDown}
+              role="button"
+              tabIndex={0}
+              aria-label="Add suggested context"
             >
-              <div
-                style={{
-                  // minWidth: "96px",
-                  flexDirection: "column",
-                  lineHeight:
-                    "calc(var(--bpFontSize-scale) * var(--bpFontSize-lg))",
-                  fontSize:
-                    "calc(var(--bpFontSize-scale) * var(--bpFontSize-sm))",
-                  color: "var(--bpGray-600)",
-                  flex: 1,
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  className="bpComposerFileName"
-                  style={{
-                    maxWidth: "none",
-                    color: "var(--bpGray-600)",
-                    fontWeight: "600",
-
-                  }}
-                >
+              <div className="context-item-content">
+                <div className="bpComposerFileName context-title">
                   {suggestedContext.title}
                 </div>
-                <div
-                  className="bpComposerFileExtension"
-                  style={{ fontWeight: "400", color: "var(--bpGray-500)" }}
-                >
+                <div className="bpComposerFileExtension context-path">
                   {suggestedContext.path}
                 </div>
               </div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                className="lucide lucide-plus"
-                style={{ color: "var(--bpGray-600)" }}
-                role="button"
-                tabIndex={0}
-                aria-label="Add Context Button"
-              >
-                <path d="M5 12h14"></path>
-                <path d="M12 5v14"></path>
-              </svg>
+              <PlusIcon className="lucide lucide-plus context-icon" />
             </div>
           )}
 
           {currentContext.map((context, index) => (
             <div
-              className="bpComposerFileAttachement"
+              className="bpComposerFileAttachement context-active"
               key={index}
-              style={{
-                backgroundColor: "rgb(0 144 255/.1)",
-                border: "none",
-                padding: "var(--bpSpacing-2)",
-                marginBottom: "var(--bpSpacing-1)",
-                width: "auto"
-              }}
             >
-              <div
-                style={{
-                  minWidth: "96px",
-                  flexDirection: "column",
-                  textOverflow: "ellipsis",
-                  lineHeight:
-                    "calc(var(--bpFontSize-scale) * var(--bpFontSize-lg))",
-                  fontSize:
-                    "calc(var(--bpFontSize-scale) * var(--bpFontSize-sm))",
-                  color: "var(--bpGray-900)",
-                }}
-              >
-                <div
-                  className="bpComposerFileName"
-                  style={{
-                    maxWidth: "none",
-                    color: "rgb(0 144 255/1)",
-                    fontWeight: "600",
-                  }}
-                >
+              <div className="context-item-content">
+                <div className="bpComposerFileName context-title">
                   {context.title}
                 </div>
-                <div
-                  className="bpComposerFileExtension"
-                  style={{ fontWeight: "400" }}
-                >
+                <div className="bpComposerFileExtension context-path">
                   {context.path}
                 </div>
               </div>
-              <svg
+              <button
+                className="context-remove-button"
                 onClick={() => removeContext(index)}
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                className="lucide lucide-circle-x bpComposerFileRemoveIcon"
-                role="button"
-                tabIndex={0}
-                aria-label="Remove File Button"
+                onKeyDown={(e) => handleRemoveKeyDown(e, index)}
+                aria-label="Remove context"
               >
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="m15 9-6 6"></path>
-                <path d="m9 9 6 6"></path>
-              </svg>
+                <CloseIcon className="lucide lucide-circle-x bpComposerFileRemoveIcon" />
+              </button>
             </div>
           ))}
         </div>
