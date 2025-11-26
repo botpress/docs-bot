@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { useWebchat } from "@botpress/webchat";
 import { shouldSuggestContext, type MessageData, type ContextItem } from "../utils/messageHandlers";
-import { PARENT_ORIGIN } from "../config/constants";
+import { ALLOWED_PARENT_ORIGINS } from "../config/constants";
 
 type WebchatClient = ReturnType<typeof useWebchat>["client"];
 
@@ -75,8 +75,8 @@ export function useParentWindowMessages({
     };
 
     const handleMessage = (event: MessageEvent<MessageData>) => {
-      if (event.origin !== PARENT_ORIGIN) {
-        console.warn(`Blocked message from unauthorized origin: ${event.origin}`);
+      if (!ALLOWED_PARENT_ORIGINS.includes(event.origin)) {
+        console.warn(`Blocked message from unauthorized origin: ${event.origin}`)
         return;
       }
 

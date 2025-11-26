@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { PARENT_ORIGIN } from "../config/constants";
+import { ALLOWED_PARENT_ORIGINS } from "../config/constants";
 
 export function useKeyboardShortcuts() {
   useEffect(() => {
@@ -9,12 +9,12 @@ export function useKeyboardShortcuts() {
 
       if (e.key === "Escape") {
         e.preventDefault();
-        window.parent.postMessage({ type: "closePanel" }, PARENT_ORIGIN);
+        window.parent.postMessage({ type: "closePanel" }, ALLOWED_PARENT_ORIGINS.includes(document.referrer) ? document.referrer : "https://botpress.com");
       }
 
       if (modifierKey && e.key === "i" && !e.shiftKey && !e.altKey) {
         e.preventDefault();
-        window.parent.postMessage({ type: "togglePanel" }, PARENT_ORIGIN);
+        window.parent.postMessage({ type: "togglePanel" }, ALLOWED_PARENT_ORIGINS.includes(document.referrer) ? document.referrer : "https://botpress.com");
       }
     };
 
