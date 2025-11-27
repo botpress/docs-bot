@@ -13,7 +13,7 @@ export function Context({ attached }: { attached: string }) {
             <span className="attached-context-title">
               <a
                 href={`https://botpress.com/docs` + context.path}
-                className="context-link"
+                className="attached-context-link"
                 target="_blank"
                 rel="noopener noreferrer"
               >
