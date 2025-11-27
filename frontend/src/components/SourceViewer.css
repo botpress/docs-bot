@@ -1,0 +1,26 @@
+.source-viewer-container {
+  color: var(--bpGray-500);
+}
+
+.source-viewer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+}
+
+.source-viewer-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.source-viewer-link {
+  color: var(--bpPrimary-600) !important;
+  text-decoration: none;
+}
+
+.source-viewer-link:hover {
+  opacity: 0.9;
+}

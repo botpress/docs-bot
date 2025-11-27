@@ -1,11 +1,12 @@
 import { Conversation, z } from "@botpress/runtime";
 import { KnowledgeDocs } from "../knowledge/docs";
+import { makeGuardrails } from "./extensions/guardrails";
 
 export default new Conversation({
   channel: ["webchat.channel"],
   handler: async ({ execute, state, message, conversation }) => {
     let selectedModel;
-    
+
     if (
       message?.payload &&
       "type" in message.payload &&
@@ -44,20 +45,21 @@ export default new Conversation({
       }
     }
 
+    const { onBeforeToolGuard } = makeGuardrails(message);
+
     await execute({
       instructions: `
-You are the AI Assistant for the Botpress documentation. Give accurate answers to all user questions. Use markdown to format your answers (use code blocks for code).
+You are the AI Assistant for the Botpress documentation. Give concise, accurate answers to all user questions. Use markdown with subheadings to format your answers (use code blocks for code).
 
 If there are any pages in ${state.context}, prioritize them when generating your answer.
 
-Always include a **Sources** section at the bottom of your answer with markdown links to all the pages you used to answer the question (the link preview should just be the title of the page).
-
-Never use inline citations.
+Don't use emojis or inline citations.
 `,
       knowledge: [KnowledgeDocs],
       model: selectedModel || "auto",
       hooks: {
         onBeforeTool: async (event) => {
+          await onBeforeToolGuard(event);
           if (event.tool.name === "search_knowledge") {
             conversation.send({
               type: "custom",
@@ -70,7 +72,6 @@ Never use inline citations.
         },
       },
     });
-
     state.context = [];
   },
   state: z.object({

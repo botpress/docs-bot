@@ -7,6 +7,7 @@ import {
   StylesheetProvider,
 } from "@botpress/webchat";
 import Context from "./components/Context";
+import TextRenderer from "./components/TextRenderer";
 import CustomTextRenderer from "./components/CustomTextRenderer";
 import ModelSelector from "./components/ModelSelector";
 import { DEFAULT_MODEL } from "./config/models";
@@ -36,13 +37,14 @@ function App() {
       clientId: CLIENT_ID,
     });
 
-  const { lastSentMessagePathRef, currentPagePathRef } = useParentWindowMessages({
-    client,
-    currentContext,
-    setCurrentContext,
-    setSuggestedContext,
-    inputRef,
-  });
+  const { lastSentMessagePathRef, currentPagePathRef } =
+    useParentWindowMessages({
+      client,
+      currentContext,
+      setCurrentContext,
+      setSuggestedContext,
+      inputRef,
+    });
 
   useKeyboardShortcuts();
 
@@ -50,7 +52,7 @@ function App() {
 
   const sendMessage = useMessageSender({
     client,
-          currentContext, 
+    currentContext,
     selectedModel,
     setCurrentContext,
     setSuggestedContext,
@@ -82,10 +84,12 @@ function App() {
           botName={BOT_CONFIG.name}
           botDescription={BOT_CONFIG.description}
           isTyping={isTyping}
+          showMessageStatus={true}
           showMarquee={true}
           messages={enrichedMessages}
           sendMessage={sendMessage}
           renderers={{
+            bubble: TextRenderer,
             custom: CustomTextRenderer,
           }}
         />
