@@ -1,7 +1,7 @@
 import { z, defineConfig } from "@botpress/runtime";
 
 export default defineConfig({
-  name: "agent",
+  name: "adk-docs-bot",
   description: "An AI agent built with Botpress ADK",
 
   defaultModels: {

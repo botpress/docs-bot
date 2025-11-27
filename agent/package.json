@@ -10,7 +10,7 @@
     "deploy": "adk deploy"
   },
   "dependencies": {
-    "@botpress/runtime": "^1.7.7"
+    "@botpress/runtime": "^1.7.15"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
