@@ -5,7 +5,7 @@
     "": {
       "name": "agent",
       "dependencies": {
-        "@botpress/runtime": "^1.7.15",
+        "@botpress/runtime": "^1.11.0",
       },
       "devDependencies": {
         "typescript": "^5.9.3",
@@ -73,11 +73,11 @@
 
     "@babel/types": ["@babel/types@7.28.5", "", { "dependencies": { "@babel/helper-string-parser": "^7.27.1", "@babel/helper-validator-identifier": "^7.28.5" } }, "sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA=="],
 
-    "@botpress/client": ["@botpress/client@1.27.1", "", { "dependencies": { "axios": "^1.6.1", "axios-retry": "^4.5.0", "browser-or-node": "^2.1.1", "qs": "^6.11.0" } }, "sha512-c6EDjUphVehm6WIZse4qTHaYL0oudObrdGnRg6r2040lNIF+nFl7e24EvbO5fB4pxp1/ApoQMPJaPA5nJVOVLg=="],
+    "@botpress/client": ["@botpress/client@1.27.2", "", { "dependencies": { "axios": "^1.6.1", "axios-retry": "^4.5.0", "browser-or-node": "^2.1.1", "qs": "^6.11.0" } }, "sha512-fTP42EDRnhRZDdRFAUQlMUDQ0CxMYchnhDsT/4Luubz6n8gKea9eBz5t0UngCzD98Eat5D+UbnfkAR89IQDWpA=="],
 
     "@botpress/cognitive": ["@botpress/cognitive@0.2.1", "", { "dependencies": { "exponential-backoff": "^3.1.1", "nanoevents": "^9.1.0" } }, "sha512-h7+/SOvGgUsVGQ0w5bsOPdgsMOl9WVGGNhtTeQMu5MRxMhjpGVuIcYZ6RewspiVBpNpbMwHg9Pbco7z00hcK1w=="],
 
-    "@botpress/runtime": ["@botpress/runtime@1.7.16", "", { "dependencies": { "@botpress/client": "^1.27.0", "@botpress/cognitive": "^0.2.0", "@botpress/sdk": "^4.18.1", "@botpress/zai": "^2.5.0", "@bpinternal/const": "^0.3.3", "@bpinternal/thicktoken": "^1.0.0", "@bpinternal/zui": "^1.2.2", "@opentelemetry/api": "^1.9.0", "@opentelemetry/context-async-hooks": "^2.1.0", "@opentelemetry/core": "^2.1.0", "@opentelemetry/instrumentation": "^0.205.0", "@opentelemetry/instrumentation-http": "^0.205.0", "@opentelemetry/resources": "^2.1.0", "@opentelemetry/sdk-trace-base": "^2.1.0", "@opentelemetry/sdk-trace-node": "^2.1.0", "@opentelemetry/semantic-conventions": "^1.37.0", "axios": "^1.11.0", "bytes": "^3.1.2", "dedent": "^1.6.0", "fast-safe-stringify": "^2.1.1", "fast-xml-parser": "^5.3.0", "glob": "^11.0.3", "llmz": "^0.0.31", "lodash": "^4.17.21", "ms": "^2.1.3", "object-sizeof": "^2.6.5", "pretty-bytes": "^7.0.1", "ulid": "^3.0.1", "undici": "^7.16.0" }, "peerDependencies": { "typescript": ">=4.5.0" } }, "sha512-l6hKrKUycq6zajN7pi/4hUe0p8qlk4teUiUUI3jxF4ZfCaTCHnKMSSPoHktnkjsGdA2qcytmZ1QIq0/cBP1KtQ=="],
+    "@botpress/runtime": ["@botpress/runtime@1.11.0", "", { "dependencies": { "@botpress/client": "^1.27.2", "@botpress/cognitive": "^0.2.0", "@botpress/sdk": "^4.18.1", "@botpress/zai": "^2.5.0", "@bpinternal/const": "^0.3.3", "@bpinternal/thicktoken": "^1.0.0", "@bpinternal/zui": "^1.2.2", "@opentelemetry/api": "^1.9.0", "@opentelemetry/context-async-hooks": "^2.1.0", "@opentelemetry/core": "^2.1.0", "@opentelemetry/instrumentation": "^0.205.0", "@opentelemetry/instrumentation-http": "^0.205.0", "@opentelemetry/resources": "^2.1.0", "@opentelemetry/sdk-trace-base": "^2.1.0", "@opentelemetry/sdk-trace-node": "^2.1.0", "@opentelemetry/semantic-conventions": "^1.37.0", "axios": "^1.11.0", "bytes": "^3.1.2", "dedent": "^1.6.0", "fast-safe-stringify": "^2.1.1", "fast-xml-parser": "^5.3.0", "glob": "^11.0.3", "llmz": "^0.0.33", "lodash": "^4.17.21", "ms": "^2.1.3", "object-sizeof": "^2.6.5", "pretty-bytes": "^7.0.1", "ulid": "^3.0.1", "undici": "^7.16.0" }, "peerDependencies": { "typescript": ">=4.5.0" } }, "sha512-Gw4sxY6fX+R23zrokoOYEMmnseEFHF+eVhg3yq60VAGxOcZiBjwNpH88K3V+jQ3g26qV5OA2GNa5S0o8c80xcQ=="],
 
     "@botpress/sdk": ["@botpress/sdk@4.20.0", "", { "dependencies": { "@botpress/client": "1.27.1", "browser-or-node": "^2.1.1", "semver": "^7.3.8" }, "peerDependencies": { "@bpinternal/zui": "1.2.1", "esbuild": "^0.16.12" }, "optionalPeers": ["esbuild"] }, "sha512-2K0Fn9BXJFKRBg6wA2/Uh+eRiwAzkBoKsFNkYwrua2bdri/HraXdZ3iX7JAxUwKFOTzmJrNnVKydCClnLdmBvw=="],
 
@@ -253,7 +253,7 @@
 
     "jsonrepair": ["jsonrepair@3.13.1", "", { "bin": { "jsonrepair": "bin/cli.js" } }, "sha512-WJeiE0jGfxYmtLwBTEk8+y/mYcaleyLXWaqp5bJu0/ZTSeG0KQq/wWQ8pmnkKenEdN6pdnn6QtcoSUkbqDHWNw=="],
 
-    "llmz": ["llmz@0.0.31", "", { "dependencies": { "@babel/core": "^7.26.0", "@babel/generator": "^7.26.3", "@babel/parser": "^7.26.3", "@babel/plugin-transform-react-jsx": "^7.25.9", "@babel/preset-typescript": "^7.26.0", "@babel/standalone": "^7.26.4", "@babel/traverse": "^7.26.4", "@babel/types": "^7.26.3", "@jitl/quickjs-singlefile-browser-release-sync": "^0.31.0", "bytes": "^3.1.2", "exponential-backoff": "^3.1.1", "handlebars": "^4.7.8", "lodash-es": "^4.17.21", "lru-cache": "^11.0.2", "ms": "^2.1.3", "prettier": "^3.4.2", "quickjs-emscripten-core": "^0.31.0", "ulid": "^2.3.0" }, "peerDependencies": { "@botpress/client": "1.27.1", "@botpress/cognitive": "0.2.1", "@bpinternal/thicktoken": "^1.0.5", "@bpinternal/zui": "1.2.1" }, "optionalPeers": ["@botpress/client"] }, "sha512-RyPgS6nIBedK7hDJ6gGQFr7hhkf901fDEkJ1ZN/wCJXjpRdzFfUqJ0uHbek1SG+ZFhKsG9xuF22H71crvrz6+w=="],
+    "llmz": ["llmz@0.0.33", "", { "dependencies": { "@babel/core": "^7.26.0", "@babel/generator": "^7.26.3", "@babel/parser": "^7.26.3", "@babel/plugin-transform-react-jsx": "^7.25.9", "@babel/preset-typescript": "^7.26.0", "@babel/standalone": "^7.26.4", "@babel/traverse": "^7.26.4", "@babel/types": "^7.26.3", "@jitl/quickjs-singlefile-browser-release-sync": "^0.31.0", "bytes": "^3.1.2", "exponential-backoff": "^3.1.1", "handlebars": "^4.7.8", "lodash-es": "^4.17.21", "lru-cache": "^11.0.2", "ms": "^2.1.3", "prettier": "^3.4.2", "quickjs-emscripten-core": "^0.31.0", "ulid": "^2.3.0" }, "peerDependencies": { "@botpress/client": "1.27.2", "@botpress/cognitive": "0.3.1", "@bpinternal/thicktoken": "^1.0.5", "@bpinternal/zui": "1.2.1" }, "optionalPeers": ["@botpress/client"] }, "sha512-r+5Z+AseEoj99a6cory4CujCcKulEtLwrDrNU63+KOV4YtABLDpjz/NLffnBIEvC/HTP9W2aQ7/vi4kg9KaxBA=="],
 
     "lodash": ["lodash@4.17.21", "", {}, "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="],
 
@@ -373,9 +373,13 @@
 
     "@babel/helper-create-class-features-plugin/semver": ["semver@6.3.1", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA=="],
 
+    "@botpress/sdk/@botpress/client": ["@botpress/client@1.27.1", "", { "dependencies": { "axios": "^1.6.1", "axios-retry": "^4.5.0", "browser-or-node": "^2.1.1", "qs": "^6.11.0" } }, "sha512-c6EDjUphVehm6WIZse4qTHaYL0oudObrdGnRg6r2040lNIF+nFl7e24EvbO5fB4pxp1/ApoQMPJaPA5nJVOVLg=="],
+
     "@botpress/zai/@botpress/cognitive": ["@botpress/cognitive@0.3.0", "", { "dependencies": { "exponential-backoff": "^3.1.1", "nanoevents": "^9.1.0" } }, "sha512-YHpknwI24Hlxj+mJU73udXx64wasLrXxqPgkgzFm8aJKsQx4lyTJBYcu8vjmikOzDkBPG7kROWeLH1Luut91kA=="],
 
     "@opentelemetry/instrumentation-http/@opentelemetry/core": ["@opentelemetry/core@2.1.0", "", { "dependencies": { "@opentelemetry/semantic-conventions": "^1.29.0" }, "peerDependencies": { "@opentelemetry/api": ">=1.0.0 <1.10.0" } }, "sha512-RMEtHsxJs/GiHHxYT58IY57UXAQTuUnZVco6ymDEqTNlJKTimM4qPUPVe8InNFyBjhHBEAx4k3Q8LtNayBsbUQ=="],
+
+    "llmz/@botpress/cognitive": ["@botpress/cognitive@0.3.0", "", { "dependencies": { "exponential-backoff": "^3.1.1", "nanoevents": "^9.1.0" } }, "sha512-YHpknwI24Hlxj+mJU73udXx64wasLrXxqPgkgzFm8aJKsQx4lyTJBYcu8vjmikOzDkBPG7kROWeLH1Luut91kA=="],
 
     "llmz/ulid": ["ulid@2.4.0", "", { "bin": { "ulid": "bin/cli.js" } }, "sha512-fIRiVTJNcSRmXKPZtGzFQv9WRrZ3M9eoptl/teFJvjOzmpU+/K/JH6HZ8deBfb5vMEpicJcLn7JmvdknlMq7Zg=="],
 
