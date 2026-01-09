@@ -1,11 +1,12 @@
-import { Conversation, z } from "@botpress/runtime";
+import { Conversation, z, adk } from "@botpress/runtime";
 import { KnowledgeDocs } from "../knowledge/docs";
 import { makeGuardrails } from "./extensions/guardrails";
 
 export default new Conversation({
   channel: ["webchat.channel"],
-  handler: async ({ execute, state, message, conversation }) => {
+  handler: async ({ execute, state, message, conversation, client }) => {
     let selectedModel;
+    let messageText = "";
 
     if (
       message?.payload &&
@@ -20,32 +21,31 @@ export default new Conversation({
           (item: { title: string; path: string }) => item.path
         ) || [];
 
-      // Extract the selected model from the payload
       if (parsed.model) {
         selectedModel = parsed.model;
+      }
+
+      if ("text" in message.payload) {
+        messageText = message.payload.text;
       }
 
       if (contextToAdd.length > 0) {
         state.context = contextToAdd;
         conversation.send({
           type: "custom",
-          payload: {
-            url: "",
-            name: `Reading context...`,
-          },
+          payload: { url: "", name: "Reading context..." },
         });
       } else {
         conversation.send({
           type: "custom",
-          payload: {
-            url: "",
-            name: "Thinking...",
-          },
+          payload: { url: "", name: "Thinking..." },
         });
       }
     }
 
     const { onBeforeToolGuard } = makeGuardrails(message);
+
+    let lastYieldedMessage = "";
 
     await execute({
       instructions: `
@@ -70,8 +70,46 @@ Don't use emojis or inline citations.
             });
           }
         },
+        onTrace: ({ trace }) => {
+          if (trace.type === "yield" && trace.value?.children) {
+            const textContent = trace.value.children
+              .filter((child: unknown) => typeof child === "string")
+              .join(" ")
+              .trim();
+            if (textContent) {
+              lastYieldedMessage = textContent;
+            }
+          }
+        },
       },
     });
+
+    if (!conversation.tags.title && lastYieldedMessage) {
+      let title: string;
+      try {
+        title = await adk.zai.rewrite(
+          lastYieldedMessage,
+          "Use this message to generate a summary of the chat as a 1-5 word title without punctuation. Use sentence case",
+          { length: 15 }
+        );
+        title = title.trim().slice(0, 50);
+      } catch {
+        title =
+          lastYieldedMessage.slice(0, 30) +
+          (lastYieldedMessage.length > 30 ? "..." : "");
+      }
+
+      conversation.tags.title = title;
+
+      await client.callAction({
+        type: "webchat:customEvent",
+        input: {
+          conversationId: conversation.id,
+          event: JSON.stringify({ type: "conversationTitle", title }),
+        },
+      });
+    }
+
     state.context = [];
   },
   state: z.object({

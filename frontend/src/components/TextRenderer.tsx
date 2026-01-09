@@ -5,7 +5,6 @@ import SourceViewer from "./SourceViewer";
 import { Context } from "./AttachedContext";
 
 const CustomTextRenderer: FC<BlockObjects["bubble"]> = (props) => {
-  console.log(props);
   const DefaultBubbleRenderer = renderers.bubble;
 
   type Citation = {

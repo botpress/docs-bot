@@ -9,11 +9,11 @@
   border-top: none;
   border-bottom: none;
   border-right: none;
-  border-left: none
+  border-left: none;
 }
 
 button:hover {
-  border-color: transparent
+  border-color: transparent;
 }
 
 .bpHeaderContainer {
@@ -42,7 +42,7 @@ button:hover {
 }
 
 .bpComposerFileAttachement {
-  background-color: #ffffff
+  background-color: #ffffff;
 }
 
 .bpMessageListMarqueeContainer {
@@ -60,7 +60,7 @@ button:hover {
 }
 
 .bpMessageBlocksRow {
-  padding: var(--bpSpacing-2) var(--bpSpacing-4)
+  padding: var(--bpSpacing-2) var(--bpSpacing-4);
 }
 
 .bpMessageListViewport {
@@ -72,7 +72,7 @@ button:hover {
 }
 
 .bpModalButtonConfirm {
-  color: var(--bpPrimary-50)
+  color: var(--bpPrimary-50);
 }
 
 :host,
@@ -80,10 +80,10 @@ button:hover {
   color-scheme: inherit;
 }
 
-.bpMessageBlocksBubble[data-direction=outgoing] {
+.bpMessageBlocksBubble[data-direction="outgoing"] {
   background-color: #ffffff;
   border: 1px solid var(--bpGray-200);
-  color: var(--bpGray-900)
+  color: var(--bpGray-900);
 }
 
 .bpMessageBlocksTextCode {
@@ -95,34 +95,37 @@ button:hover {
   --bpGray-100: transparent;
   --button-bg: var(--primary-color);
   --button-text: #ffffff;
-  --primary-color: #0090FF;
+  --primary-color: #0090ff;
+  --dropdown-element-hover: rgb(79 84 87 /0.05);
   font-weight: 400 !important
+;
 }
 
 @media (prefers-color-scheme: dark) {
   :root .bpReset {
     --button-bg: var(--primary-color);
     --bpGray-1: #09090b !important;
-    --bpGray-50: #15161A;
+    --bpGray-50: #15161a;
     --bpGray-100: #2b2b2b;
-    --bpGray-200: #2F323B;
-    --bpGray-300: #3F434F;
-    --bpGray-400: #5F6476;
-    --bpGray-500: #696F83;
-    --bpGray-600: #969AA8;
-    --bpGray-700: #C3C5CD;
-    --bpGray-800: #DADBE0;
-    --bpGray-900: #F0F1F3;
-    --bpGray-950: #F8F8F9;
+    --bpGray-200: #2f323b;
+    --bpGray-300: #3f434f;
+    --bpGray-400: #5f6476;
+    --bpGray-500: #696f83;
+    --bpGray-600: #969aa8;
+    --bpGray-700: #c3c5cd;
+    --bpGray-800: #dadbe0;
+    --bpGray-900: #f0f1f3;
+    --bpGray-950: #f8f8f9;
+    --dropdown-element-hover: rgb(222 226 230 /0.05);
   }
 
-  .bpMessageBlocksBubble[data-direction=outgoing] {
+  .bpMessageBlocksBubble[data-direction="outgoing"] {
     background-color: #1a1a1a;
-    color: var(--bpPrimary-50)
+    color: var(--bpPrimary-50);
   }
 
   .bpComposerFileAttachement {
-    background-color: var(--bpGray-1)
+    background-color: var(--bpGray-1);
   }
 }
 

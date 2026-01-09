@@ -1,27 +1,42 @@
 import {
   Container,
-  Header,
   MessageList,
   Composer,
   useWebchat,
   StylesheetProvider,
+  getUseWebchatClientStore,
 } from "@botpress/webchat";
 import Context from "./components/Context";
 import TextRenderer from "./components/TextRenderer";
 import CustomTextRenderer from "./components/CustomTextRenderer";
 import ModelSelector from "./components/ModelSelector";
+import { ChatHeader } from "./components/ChatHeader";
 import { DEFAULT_MODEL } from "./config/models";
 import { BOT_CONFIG, CLIENT_ID } from "./config/constants";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useContextManagement } from "./hooks/useContextManagement";
 import { useParentWindowMessages } from "./hooks/useParentWindowMessages";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useEnrichedMessages } from "./hooks/useEnrichedMessages";
 import { useMessageSender } from "./hooks/useMessageSender";
+import { useConversationHistory } from "./hooks/useConversationHistory";
 import "./App.css";
 
 function App() {
   const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODEL.id);
+  const [titleJustUpdated, setTitleJustUpdated] = useState(false);
+
+  const {
+    conversationIds,
+    selectedConversationId,
+    conversationTitles,
+    addConversation,
+    selectConversation,
+    removeConversation,
+    setConversationTitle,
+    getConversationTitle,
+    clearAllConversations,
+  } = useConversationHistory();
 
   const {
     currentContext,
@@ -32,10 +47,55 @@ function App() {
     inputRef,
   } = useContextManagement();
 
-  const { client, messages, isTyping, user, clientState, newConversation } =
-    useWebchat({
-      clientId: CLIENT_ID,
+  const {
+    client,
+    messages,
+    isTyping,
+    user,
+    clientState,
+    newConversation,
+    conversationId,
+    on,
+  } = useWebchat({
+    clientId: CLIENT_ID,
+    conversationId: selectedConversationId,
+  });
+
+  const useWebchatClientStore = getUseWebchatClientStore();
+  const setConversationId = useWebchatClientStore(
+    (state) => state.setConversationId
+  );
+
+  const handleSelectConversation = useCallback(
+    (id: string) => {
+      selectConversation(id);
+      setConversationId(id);
+    },
+    [selectConversation, setConversationId]
+  );
+
+  useEffect(() => {
+    if (conversationId && !conversationIds.includes(conversationId)) {
+      addConversation(conversationId);
+    }
+  }, [conversationId, conversationIds, addConversation]);
+
+  useEffect(() => {
+    const unsubscribe = on("customEvent", (event: Record<string, unknown>) => {
+      if (
+        event.type === "conversationTitle" &&
+        typeof event.title === "string"
+      ) {
+        if (conversationId && !conversationTitles[conversationId]) {
+          setConversationTitle(conversationId, event.title);
+          setTitleJustUpdated(true);
+          setTimeout(() => setTitleJustUpdated(false), 400);
+        }
+      }
     });
+
+    return unsubscribe;
+  }, [on, conversationId, conversationTitles, setConversationTitle]);
 
   const { lastSentMessagePathRef, currentPagePathRef } =
     useParentWindowMessages({
@@ -60,6 +120,23 @@ function App() {
     currentPagePathRef,
   });
 
+  const handleNewConversation = async () => {
+    const emptyChat = conversationIds.find(
+      (id) => getConversationTitle(id) === "New chat"
+    );
+
+    if (emptyChat) {
+      handleSelectConversation(emptyChat);
+    } else {
+      await newConversation();
+    }
+  };
+
+  const handleClearAllConversations = async () => {
+    clearAllConversations();
+    await newConversation();
+  };
+
   return (
     <>
       <Container
@@ -70,15 +147,19 @@ function App() {
           display: "flex",
         }}
       >
-        <Header
-          defaultOpen={false}
-          restartConversation={newConversation}
-          disabled={false}
-          configuration={{
-            botName: BOT_CONFIG.name,
-            botAvatar: BOT_CONFIG.avatar,
-            botDescription: BOT_CONFIG.description,
-          }}
+        <ChatHeader
+          botName={BOT_CONFIG.name}
+          botDescription={BOT_CONFIG.description}
+          botAvatar={BOT_CONFIG.avatar}
+          conversationIds={conversationIds}
+          selectedConversationId={selectedConversationId}
+          currentConversationId={conversationId}
+          onSelectConversation={handleSelectConversation}
+          onNewConversation={handleNewConversation}
+          onClearAllConversations={handleClearAllConversations}
+          onDeleteConversation={removeConversation}
+          getConversationTitle={getConversationTitle}
+          titleJustUpdated={titleJustUpdated}
         />
         <MessageList
           botName={BOT_CONFIG.name}

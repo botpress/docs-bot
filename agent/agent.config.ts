@@ -17,6 +17,15 @@ export default defineConfig({
     state: z.object({}),
   },
 
+  conversation: {
+    tags: {
+      title: {
+        title: "Conversation Title",
+        description: "A short summary of the conversation topic",
+      },
+    },
+  },
+
   dependencies: {
     integrations: {
       chat: { version: "chat@0.7.3", enabled: true },
