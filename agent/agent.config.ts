@@ -23,6 +23,10 @@ export default defineConfig({
         title: "Conversation Title",
         description: "A short summary of the conversation topic",
       },
+      hasMessages: {
+        title: "Has Messages",
+        description: "Whether the conversation has messages in it",
+      },
     },
   },
 

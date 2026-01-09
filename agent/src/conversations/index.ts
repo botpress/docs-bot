@@ -8,6 +8,8 @@ export default new Conversation({
     let selectedModel;
     let messageText = "";
 
+    if (message) conversation.tags.hasMessages = "true";
+
     if (
       message?.payload &&
       "type" in message.payload &&
