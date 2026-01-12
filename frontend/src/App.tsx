@@ -39,7 +39,6 @@ function App() {
     clearAllConversations,
   } = useConversationHistory();
 
-  // Initialize as true when there are no conversations (fresh session)
   const [isNewChatRequested, setIsNewChatRequested] = useState(
     () => conversationIds.length === 0
   );
@@ -183,11 +182,6 @@ function App() {
             (!selectedConversationId ||
               selectedConversationId === conversationId);
 
-          // Show empty state immediately when:
-          // - Conversation is ready and empty
-          // - User explicitly requested new chat
-          // - No conversation selected yet
-          // - Fresh session with no conversation history
           const showEmptyState =
             enrichedMessages.length === 0 &&
             !isTyping &&
