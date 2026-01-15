@@ -19,8 +19,8 @@ export default defineConfig({
 
   conversation: {
     tags: {
-      title: {
-        title: "Conversation Title",
+      chatSummaryTitle: {
+        title: "Chat Summary Title",
         description: "A short summary of the conversation topic",
       },
       hasMessages: {

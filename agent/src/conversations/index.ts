@@ -110,7 +110,7 @@ Don't use emojis or inline citations.
       },
     });
 
-    if (!conversation.tags.title && lastYieldedMessage) {
+    if (!conversation.tags.chatSummaryTitle && lastYieldedMessage) {
       let title: string;
       try {
         title = await adk.zai.rewrite(
@@ -125,7 +125,7 @@ Don't use emojis or inline citations.
           (lastYieldedMessage.length > 30 ? "..." : "");
       }
 
-      conversation.tags.title = title;
+      conversation.tags.chatSummaryTitle = title;
 
       await client.callAction({
         type: "webchat:customEvent",
