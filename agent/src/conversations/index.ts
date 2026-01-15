@@ -7,16 +7,18 @@ export default new Conversation({
   handler: async ({ execute, state, message, conversation, client }) => {
     console.log("Called handler, starting execution", {
       message,
-      tags: conversation.tags,
+      tags: JSON.stringify(conversation.tags),
     });
 
     let selectedModel;
     let messageText = "";
 
-    console.log(`Tags before validation: ${conversation.tags}`);
+    console.log(`Tags before validation: ${JSON.stringify(conversation.tags)}`);
 
     if (message && message.direction === "incoming") {
-      console.log(`Handler received an incoming message: ${message}`);
+      console.log(
+        `Handler received an incoming message: ${JSON.stringify(message)}`
+      );
 
       if (conversation.tags.hasMessages === undefined) {
         console.log("hasMessages not assigned yet, setting to true");
@@ -27,6 +29,10 @@ export default new Conversation({
     } else {
       console.log("skipping tag update");
     }
+
+    console.log(
+      `Validation done, tags after validation: ${JSON.stringify(conversation.tags)}`
+    );
 
     if (
       message?.payload &&
