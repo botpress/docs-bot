@@ -5,34 +5,15 @@ import { makeGuardrails } from "./extensions/guardrails";
 export default new Conversation({
   channel: ["webchat.channel"],
   handler: async ({ execute, state, message, conversation, client }) => {
-    console.log("Called handler, starting execution", {
-      message,
-      tags: JSON.stringify(conversation.tags),
-    });
-
     let selectedModel;
     let messageText = "";
 
-    console.log(`Tags before validation: ${JSON.stringify(conversation.tags)}`);
-
-    if (message && message.direction === "incoming") {
-      console.log(
-        `Handler received an incoming message: ${JSON.stringify(message)}`
-      );
-
-      if (conversation.tags.hasMessages === undefined) {
-        console.log("hasMessages not assigned yet, setting to true");
-        conversation.tags.hasMessages = "true";
-      } else {
-        console.log("hasMessages already assigned, skipping update");
-      }
-    } else {
-      console.log("skipping tag update");
-    }
-
-    console.log(
-      `Validation done, tags after validation: ${JSON.stringify(conversation.tags)}`
-    );
+    if (
+      message &&
+      message.direction === "incoming" &&
+      conversation.tags.hasMessages === undefined
+    )
+      conversation.tags.hasMessages = "true";
 
     if (
       message?.payload &&
