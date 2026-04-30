@@ -1,0 +1,251 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design 3 — Claude.ai / Notion-AI inspired clean modern chat.
+ * Light-first with rich dark mode. Inter Variable everywhere. Generous
+ * whitespace, soft surfaces, single accent color. Assistant text has no
+ * bubble; user messages get a soft pill.
+ */
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: hsl(var(--background));
+  --color-surface: hsl(var(--surface));
+  --color-surface-elevated: hsl(var(--surface-elevated));
+  --color-foreground: hsl(var(--foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
+  --color-accent: hsl(var(--accent));
+  --color-user-bubble: hsl(var(--user-bubble));
+  --color-user-bubble-foreground: hsl(var(--user-bubble-foreground));
+
+  --radius-xl: 16px;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+}
+
+/* Light theme — soft warm off-white, deep ink text */
+:root {
+  --background: 30 8% 98%;
+  --surface: 0 0% 100%;
+  --surface-elevated: 0 0% 100%;
+  --foreground: 24 12% 14%;
+  --muted: 30 8% 96%;
+  --muted-foreground: 25 6% 45%;
+  --border: 25 8% 90%;
+  --accent: 24 12% 14%;
+  --user-bubble: 30 10% 94%;
+  --user-bubble-foreground: 24 12% 14%;
+}
+
+/* Dark theme — rich ink, not pure black */
+:root.dark {
+  --background: 24 8% 9%;
+  --surface: 24 8% 11%;
+  --surface-elevated: 24 8% 13%;
+  --foreground: 30 10% 96%;
+  --muted: 24 8% 14%;
+  --muted-foreground: 25 4% 62%;
+  --border: 24 6% 20%;
+  --accent: 30 10% 96%;
+  --user-bubble: 24 8% 18%;
+  --user-bubble-foreground: 30 10% 96%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.dark) {
+    --background: 24 8% 9%;
+    --surface: 24 8% 11%;
+    --surface-elevated: 24 8% 13%;
+    --foreground: 30 10% 96%;
+    --muted: 24 8% 14%;
+    --muted-foreground: 25 4% 62%;
+    --border: 24 6% 20%;
+    --accent: 30 10% 96%;
+    --user-bubble: 24 8% 18%;
+    --user-bubble-foreground: 30 10% 96%;
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fade-in for the empty-state hero */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Working/typing indicator pulse */
+@keyframes pulse-dot {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pulse-dot {
+  animation: pulse-dot 1.2s infinite ease-in-out;
+}
+.pulse-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.pulse-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Claude.ai-style shimmering "Thinking…" — a soft highlight sweeps across
+ * the muted-foreground text. */
+@keyframes shimmer-sweep {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.thinking-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted-foreground)) 0%,
+    hsl(var(--muted-foreground)) 30%,
+    hsl(var(--foreground)) 50%,
+    hsl(var(--muted-foreground)) 70%,
+    hsl(var(--muted-foreground)) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-sweep 1.8s linear infinite;
+}
+
+/* Morphing square ↔ circle (lifted from agent-lack's agent-info-dialog).
+ * The shape rotates and rounds its corners through five keyframes so it
+ * reads as "alive but calm" — paired with the "Thinking…" shimmer. */
+@keyframes morph-spin {
+  0% {
+    transform: rotate(45deg);
+    border-radius: 0;
+  }
+  25% {
+    transform: rotate(45deg);
+    border-radius: 50%;
+  }
+  50% {
+    transform: rotate(135deg);
+    border-radius: 50%;
+  }
+  75% {
+    transform: rotate(135deg);
+    border-radius: 0;
+  }
+  100% {
+    transform: rotate(225deg);
+    border-radius: 0;
+  }
+}
+
+.animate-morph-spin {
+  animation: morph-spin 3s ease-in-out infinite;
+}
+
+/* Thinking indicator — small Claude-orange morph with a soft glow.
+ * Sized to sit on the text baseline of a 14px line; the glow is just
+ * strong enough to feel "alive" without competing with content. */
+.thinking-morph {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  background-color: #d97757;
+  box-shadow:
+    0 0 0 1px rgba(217, 119, 87, 0.18),
+    0 0 14px -4px rgba(217, 119, 87, 0.55);
+  animation: morph-spin 3.2s ease-in-out infinite;
+}
+
+/* Use the same warm tone in the "Thinking…" shimmer so the indicator
+ * reads as one cohesive unit rather than two unrelated motifs. */
+.thinking-shimmer.thinking-shimmer-warm {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted-foreground)) 0%,
+    hsl(var(--muted-foreground)) 30%,
+    #d97757 50%,
+    hsl(var(--muted-foreground)) 70%,
+    hsl(var(--muted-foreground)) 100%
+  );
+  background-size: 200% 100%;
+}
+
+
+/* Subtle, Claude.ai-style scrollbar: thin, only visible on hover/scroll. */
+.scrollbar-subtle {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  scrollbar-gutter: stable;
+  transition: scrollbar-color 200ms ease;
+}
+.scrollbar-subtle:hover,
+.scrollbar-subtle:focus-within {
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+.scrollbar-subtle::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollbar-subtle::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-subtle::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 200ms ease;
+}
+.scrollbar-subtle:hover::-webkit-scrollbar-thumb,
+.scrollbar-subtle:focus-within::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--border));
+}
+.scrollbar-subtle::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.5);
+}
+.scrollbar-subtle::-webkit-scrollbar-corner {
+  background: transparent;
+}
