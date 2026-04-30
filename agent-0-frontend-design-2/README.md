@@ -1,16 +1,38 @@
-# agent-0-frontend (Design 2)
+# agent-0-frontend-design-2
 
-Placeholder folder for the second design direction. Awaiting design specs.
+Design 2 — same UI as the default docs assistant (a fork of `docs-bot/frontend/`), but pointed at agent-0 instead of the default docs bot.
 
-When direction is decided, scaffold:
-- Same `@botpress/webchat` connection logic as `agent-0-frontend-copilot/`
-- Same `useParentWindowMessages` hook for the docs integration
-- Same `CLIENT_ID` (agent-0's webchat config)
-- Different visual layer
+Use this slot to compare a more "branded webchat" look (Botpress blue, conversation history, model selector, context attach panel) against the leaner Copilot-style design in `agent-0-frontend-copilot/`.
 
-Conventions for this slot:
-- **Vite dev port**: `5174`
-- **Vite `base`**: `/docs-bot/agent-0-design-2/`
-- **gh-pages deploy path**: `https://jacksonyzj.github.io/docs-bot/agent-0-design-2/`
+## What's the same as `docs-bot/frontend/`
 
-To preview against the docs site, swap `ADK_BOT_URL` in `docs/assistant.js` to `http://localhost:5174/docs-bot/agent-0-design-2/`.
+Everything — App.tsx, components, hooks, styles. This is a structural fork, not a rebuild.
+
+## What's different
+
+| | `docs-bot/frontend/` | `agent-0-frontend-design-2/` |
+|---|---|---|
+| `CLIENT_ID` | default docs bot (`5b5e1c06-…`) | agent-0 (`b09761d4-…`) |
+| `BOT_CONFIG.name` | "Assistant" | "agent(0)" |
+| `BOT_CONFIG.description` | docs-wide | ADK-scoped |
+| `ALLOWED_PARENT_ORIGINS` | botpress.com only | also localhost 3000-3003 for dev |
+| `vite.config.ts` `base` | `/docs-bot/` | `/docs-bot/agent-0-design-2/` |
+| dev port | (default 5173) | pinned 5174 |
+| deploy `gh-pages` subpath | root | `agent-0-design-2/` |
+
+## Develop
+
+```bash
+bun install
+bun run dev      # → http://localhost:5174/docs-bot/agent-0-design-2/
+```
+
+## Build & deploy (to your fork's gh-pages)
+
+```bash
+bun run deploy   # → https://jacksonyzj.github.io/docs-bot/agent-0-design-2/
+```
+
+## Preview against the docs
+
+In `docs/assistant.js`, swap `ADK_BOT_URL` to `http://localhost:5174/docs-bot/agent-0-design-2/`, then `mintlify dev` and visit `/adk/*`.
