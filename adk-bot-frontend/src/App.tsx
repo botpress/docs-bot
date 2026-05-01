@@ -84,7 +84,10 @@ export default function App() {
             ? (JSON.parse(match[1]) as { title: string; url: string }[])
             : undefined
           const citations = rawCitations?.filter(
-            (s) => s.url.startsWith('http') && !s.title.startsWith('data_source://'),
+            (s) =>
+              s.url.startsWith('http') &&
+              !s.title.startsWith('data_source://') &&
+              !s.url.includes('raw.githubusercontent.com'),
           )
           const text = match ? rawText.slice(0, rawText.length - match[0].length).trim() : rawText
           const msg: ChatMessage = {
