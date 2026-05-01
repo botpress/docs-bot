@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useState, useEffect, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Check, Copy } from 'lucide-react'
@@ -77,6 +77,11 @@ export const Markdown = memo(function Markdown({ text, className }: MarkdownProp
 
           hr: () => <hr className="my-4 border-border/60" />,
 
+          img: ({ src, alt }) => {
+            if (!src) return null
+            return <DocImage src={src} alt={alt ?? ''} />
+          },
+
           table: ({ children }) => (
             <div className="my-3 overflow-x-auto scrollbar-subtle">
               <table className="text-[13px] border-collapse w-full">{children}</table>
@@ -124,6 +129,41 @@ export const Markdown = memo(function Markdown({ text, className }: MarkdownProp
     </div>
   )
 })
+
+function DocImage({ src, alt }: { src: string; alt: string }) {
+  const [open, setOpen] = useState(false)
+
+  const close = useCallback(() => setOpen(false), [])
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, close])
+
+  return (
+    <>
+      <span className="my-3 block" onClick={() => setOpen(true)}>
+        <img
+          src={src}
+          alt={alt}
+          className="w-full rounded-lg border border-border/60 cursor-zoom-in transition-opacity hover:opacity-90"
+        />
+      </span>
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 cursor-zoom-out animate-fade-in"
+          onClick={close}
+        >
+          <div className="relative max-w-5xl w-full" onClick={(e) => e.stopPropagation()}>
+            <img src={src} alt={alt} className="w-full rounded-xl shadow-2xl" />
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
 
 function CodeBlock({ lang, code }: { lang: string; code: string }) {
   const [copied, setCopied] = useState(false)

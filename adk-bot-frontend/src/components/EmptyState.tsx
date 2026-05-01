@@ -45,7 +45,7 @@ export function EmptyState({ onPick, conversationId }: EmptyStateProps) {
   const color = hashColor(conversationId || randomSeed)
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 animate-fade-up">
+    <div className="flex-1 flex flex-col items-center justify-center px-6 animate-enter">
       <div className="w-full max-w-md text-center">
         <div className="flex justify-center mb-5">
           <span

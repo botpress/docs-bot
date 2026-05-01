@@ -1,9 +1,10 @@
 {
-  "name": "adk-docs-bot",
+  "name": "adk-bot",
   "version": "1.0.0",
   "description": "A Botpress Agent built with the ADK",
   "type": "module",
   "scripts": {
+    "postinstall": "mkdir -p node_modules/@botpress/runtime/node_modules/@botpress && ([ -d node_modules/@botpress/runtime/node_modules/@botpress/sdk ] || cp -r node_modules/@botpress/sdk node_modules/@botpress/runtime/node_modules/@botpress/sdk 2>/dev/null || true) && rm -rf node_modules/@botpress/sdk",
     "dev": "adk dev",
     "build": "adk build",
     "deploy": "adk deploy"

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   useActiveConversation,
   useConversationList,
@@ -76,10 +76,11 @@ export default function App() {
             | { type?: string; text?: string }
             | undefined
           if (inner?.type !== 'text' || typeof inner.text !== 'string') return null
+          const text = inner.text
           return {
             id: m.id,
             direction: m.authorId === userId ? ('outgoing' as const) : ('incoming' as const),
-            text: inner.text,
+            text,
           }
         })
         .filter((m): m is ChatMessage => m !== null),
@@ -127,6 +128,18 @@ export default function App() {
   const hasMessages = chatMessages.length > 0
   const isBusy = Boolean(isTyping)
 
+  const [fading, setFading] = useState(false)
+  const prevConvoId = useRef(conversationId)
+  useEffect(() => {
+    if (prevConvoId.current === conversationId) return
+    const prev = prevConvoId.current
+    prevConvoId.current = conversationId
+    if (prev === undefined) return  // initial connection — no fade
+    setFading(true)
+    const t = setTimeout(() => setFading(false), 100)
+    return () => clearTimeout(t)
+  }, [conversationId])
+
   return (
     <div className="h-full flex flex-col bg-background">
       <Header
@@ -139,16 +152,24 @@ export default function App() {
         getTitle={fetchConversationTitle}
       />
 
-      {hasMessages ? (
-        <Messages
-          messages={chatMessages}
-          isThinking={isBusy}
-          thinkingComponent={<WorkingIndicator />}
-          conversationId={conversationId}
-        />
-      ) : (
-        <EmptyState onPick={handleSend} conversationId={conversationId} />
-      )}
+      <div
+        className="flex-1 flex flex-col min-h-0"
+        style={{
+          opacity: fading ? 0 : 1,
+          transition: fading ? 'opacity 80ms ease-in' : 'opacity 200ms ease-out',
+        }}
+      >
+        {hasMessages ? (
+          <Messages
+            messages={chatMessages}
+            isThinking={isBusy}
+            thinkingComponent={<WorkingIndicator />}
+            conversationId={conversationId}
+          />
+        ) : (
+          <EmptyState onPick={handleSend} conversationId={conversationId} />
+        )}
+      </div>
 
       <Composer onSend={handleSend} />
     </div>

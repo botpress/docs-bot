@@ -87,11 +87,26 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Fade-in for the empty-state hero */
+/* Slide-up entrance for the empty-state hero (App wrapper fades first,
+   then this runs — no opacity to avoid double-stacking with parent fade) */
+@keyframes enter {
+  from {
+    transform: translateY(8px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-enter {
+  animation: enter 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fade-up for dropdowns and overlays */
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -100,7 +115,17 @@ body {
 }
 
 .animate-fade-up {
-  animation: fade-up 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fade-up 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fade-in for lightbox backdrop */
+@keyframes fade-in {
+  from { opacity: 0 }
+  to   { opacity: 1 }
+}
+
+.animate-fade-in {
+  animation: fade-in 150ms ease;
 }
 
 /* Working/typing indicator pulse */

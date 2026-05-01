@@ -72,9 +72,13 @@ const SkillsSource = DataSource.Website.fromUrls(
   { id: 'botpress-skills' },
 )
 
+const ScreenshotsSource = DataSource.Directory.fromPath('./src/knowledge/docs', {
+  id: 'adk-screenshots',
+})
+
 export const WebsiteKB = new Knowledge({
   name: 'Botpress',
   description:
-    'Knowledge base containing Botpress ADK documentation and skill references.',
-  sources: [DocsSource, SkillsSource],
+    'Knowledge base containing Botpress ADK documentation, skill references, and dev console screenshots.',
+  sources: [DocsSource, SkillsSource, ScreenshotsSource],
 })

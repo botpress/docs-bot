@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { ArrowUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ALLOWED_PARENT_ORIGINS } from '@/config/constants'
 
 interface ComposerProps {
   onSend: (message: string) => void
@@ -18,6 +19,16 @@ export function Composer({ onSend }: ComposerProps) {
   useEffect(() => {
     const t = setTimeout(() => textareaRef.current?.focus(), 100)
     return () => clearTimeout(t)
+  }, [])
+
+  // Re-focus when the parent docs page opens the panel via postMessage.
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (!ALLOWED_PARENT_ORIGINS.includes(e.origin)) return
+      if (e.data?.type === 'focusInput') textareaRef.current?.focus()
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
   }, [])
 
   useEffect(() => {
