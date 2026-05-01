@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Markdown } from '@/components/Markdown'
+import { SourcesFooter } from '@/components/SourcesFooter'
 
 export interface ChatMessage {
   id: string
   direction: 'incoming' | 'outgoing'
   text: string
+  citations?: { title: string; url: string }[]
 }
 
 interface MessagesProps {
@@ -81,6 +83,9 @@ function MessageRow({
   animate: boolean
   scrollTickRef?: React.RefObject<() => void>
 }) {
+  const [streamingDone, setStreamingDone] = useState(false)
+  const showFooter = (!animate || streamingDone) && !!message.citations?.length
+
   const isUser = message.direction === 'outgoing'
   if (isUser) {
     return (
@@ -95,10 +100,15 @@ function MessageRow({
     <div className="flex w-full justify-start">
       <div className="max-w-full break-words">
         {animate ? (
-          <StreamingMarkdown text={message.text} scrollTickRef={scrollTickRef} />
+          <StreamingMarkdown
+            text={message.text}
+            scrollTickRef={scrollTickRef}
+            onComplete={() => setStreamingDone(true)}
+          />
         ) : (
           <Markdown text={message.text} />
         )}
+        {showFooter && <SourcesFooter sources={message.citations!} />}
       </div>
     </div>
   )
@@ -107,13 +117,17 @@ function MessageRow({
 function StreamingMarkdown({
   text,
   scrollTickRef,
+  onComplete,
 }: {
   text: string
   scrollTickRef?: React.RefObject<() => void>
+  onComplete?: () => void
 }) {
   const charsPerTick = Math.max(6, Math.ceil(text.length / 240))
   const [revealed, setRevealed] = useState(() => text.slice(0, charsPerTick))
   const indexRef = useRef(charsPerTick)
+  const onCompleteRef = useRef(onComplete)
+  useEffect(() => { onCompleteRef.current = onComplete })
 
   useEffect(() => {
     indexRef.current = charsPerTick
@@ -126,6 +140,7 @@ function StreamingMarkdown({
       if (indexRef.current >= text.length) {
         setRevealed(text)
         scrollTickRef?.current?.()
+        onCompleteRef.current?.()
         return
       }
       indexRef.current = Math.min(indexRef.current + charsPerTick, text.length)
@@ -139,7 +154,7 @@ function StreamingMarkdown({
       cancelled = true
       if (timer) clearTimeout(timer)
     }
-    // scrollTickRef is a stable ref object — intentionally excluded from deps
+    // scrollTickRef and onCompleteRef are stable refs — intentionally excluded from deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, charsPerTick])
 

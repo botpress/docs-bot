@@ -65,8 +65,10 @@ export default function App() {
 
   const isReady = status === 'connected'
 
-  // Map raw BlockMessages → text-only bubbles. Webchat wraps text inside a
+  // Map raw BlockMessages → chat bubbles. Webchat wraps text inside a
   // `bubble` block, so the path is `m.block.block.text`.
+  // Bot messages may contain a hidden <!--SOURCES:[...]-->> marker appended
+  // after the answer text — we strip it and expose citations separately.
   const chatMessages: ChatMessage[] = useMemo(
     () =>
       messages
@@ -76,12 +78,22 @@ export default function App() {
             | { type?: string; text?: string }
             | undefined
           if (inner?.type !== 'text' || typeof inner.text !== 'string') return null
-          const text = inner.text
-          return {
+          const rawText = inner.text
+          const match = rawText.match(/\n?<!--SOURCES:([\s\S]+?)-->$/)
+          const rawCitations = match
+            ? (JSON.parse(match[1]) as { title: string; url: string }[])
+            : undefined
+          const citations = rawCitations?.filter(
+            (s) => s.url.startsWith('http') && !s.title.startsWith('data_source://'),
+          )
+          const text = match ? rawText.slice(0, rawText.length - match[0].length).trim() : rawText
+          const msg: ChatMessage = {
             id: m.id,
-            direction: m.authorId === userId ? ('outgoing' as const) : ('incoming' as const),
+            direction: m.authorId === userId ? 'outgoing' : 'incoming',
             text,
+            ...(citations !== undefined && { citations }),
           }
+          return msg
         })
         .filter((m): m is ChatMessage => m !== null),
     [messages, userId],
