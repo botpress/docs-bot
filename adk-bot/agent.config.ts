@@ -22,8 +22,14 @@ export default defineConfig({
 
   dependencies: {
     integrations: {
-      chat: 'chat@1.0.0',
-      webchat: 'webchat@0.3.0',
+      chat: {
+        version: 'chat@1.0.0',
+        enabled: true,
+      },
+      webchat: {
+        version: 'webchat@0.3.0',
+        enabled: true,
+      },
     },
   },
 })
