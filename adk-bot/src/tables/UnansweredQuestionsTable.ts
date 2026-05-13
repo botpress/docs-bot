@@ -1,4 +1,5 @@
 import { Table, z } from '@botpress/runtime'
+import { TOPICS } from './ConversationLogsTable'
 
 /**
  * Tracks questions the ADK bot could not answer from the knowledge base.
@@ -16,10 +17,8 @@ export const UnansweredQuestionsTable = new Table({
       schema: z.string().min(1),
       searchable: true,
     },
-    channel: z.enum(['webchat', 'chat', 'unknown']).default('unknown'),
     userId: z.string(),
     conversationId: z.string(),
-    askedAt: z.string().datetime().describe('ISO 8601 timestamp'),
-    status: z.enum(['pending', 'answered', 'dismissed']).default('pending'),
+    topic: z.enum(TOPICS),
   },
 })

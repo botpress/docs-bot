@@ -1,19 +1,30 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { FeedbackCard } from '@/components/FeedbackCard'
 import { Markdown } from '@/components/Markdown'
 import { SourcesFooter } from '@/components/SourcesFooter'
 
-export interface ChatMessage {
-  id: string
-  direction: 'incoming' | 'outgoing'
-  text: string
-  citations?: { title: string; url: string }[]
-}
+export type ChatMessage =
+  | {
+      id: string
+      direction: 'incoming' | 'outgoing'
+      kind: 'text'
+      text: string
+      citations?: { title: string; url: string }[]
+    }
+  | {
+      id: string
+      direction: 'incoming'
+      kind: 'feedbackPrompt'
+      question: string
+      reason: 'unanswered' | 'active_conversation'
+    }
 
 interface MessagesProps {
   messages: ChatMessage[]
   isThinking: boolean
   thinkingComponent?: React.ReactNode
   conversationId?: string
+  onSubmitFeedback: (question: string, feedback: string, reason: 'unanswered' | 'active_conversation') => void
 }
 
 export function Messages({
@@ -21,6 +32,7 @@ export function Messages({
   isThinking,
   thinkingComponent,
   conversationId,
+  onSubmitFeedback,
 }: MessagesProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const seenRef = useRef<Set<string>>(new Set())
@@ -52,8 +64,6 @@ export function Messages({
     scrollToBottom(true)
   }, [messages, isThinking, scrollToBottom])
 
-  // Stable ref so StreamingMarkdown's effect never needs to restart when
-  // the scroll callback identity changes across re-renders.
   const scrollTickRef = useRef(() => scrollToBottom(false))
   useEffect(() => { scrollTickRef.current = () => scrollToBottom(false) }, [scrollToBottom])
 
@@ -66,6 +76,7 @@ export function Messages({
             message={m}
             animate={m.id === streamingId}
             scrollTickRef={m.id === streamingId ? scrollTickRef : undefined}
+            onSubmitFeedback={onSubmitFeedback}
           />
         ))}
         {isThinking && thinkingComponent}
@@ -78,15 +89,26 @@ function MessageRow({
   message,
   animate,
   scrollTickRef,
+  onSubmitFeedback,
 }: {
   message: ChatMessage
   animate: boolean
   scrollTickRef?: React.RefObject<() => void>
+  onSubmitFeedback: (question: string, feedback: string, reason: 'unanswered' | 'active_conversation') => void
 }) {
   const [streamingDone, setStreamingDone] = useState(false)
-  const showFooter = (!animate || streamingDone) && !!message.citations?.length
 
+  if (message.kind === 'feedbackPrompt') {
+    return (
+      <div className="flex w-full justify-start">
+        <FeedbackCard question={message.question} reason={message.reason} onSubmit={onSubmitFeedback} />
+      </div>
+    )
+  }
+
+  const showFooter = (!animate || streamingDone) && !!message.citations?.length
   const isUser = message.direction === 'outgoing'
+
   if (isUser) {
     return (
       <div className="flex w-full justify-end">
@@ -96,6 +118,7 @@ function MessageRow({
       </div>
     )
   }
+
   return (
     <div className="flex w-full justify-start">
       <div className="max-w-full break-words">

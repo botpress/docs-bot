@@ -1,9 +1,13 @@
 import { Autonomous, Conversation, z } from '@botpress/runtime'
 import { WebsiteKB } from '../knowledge'
 import { reportUnanswered } from '../tools/reportUnanswered'
+import { getRecentConversationContext } from '../utils/conversationContext'
+import { logConversationTurn } from '../utils/conversationLogs'
 import { greetingReply, isSimpleGreeting } from '../utils/greetings'
 import { makeGuardrails } from '../utils/guardrails'
 import { sanitizeAnswer } from '../utils/sanitizeAnswer'
+import { appendRelevantScreenshot } from '../utils/screenshots'
+import { checkAdkQuestionScope } from '../utils/scope'
 
 const AnswerExit = new Autonomous.Exit({
   name: 'answer',
@@ -19,6 +23,8 @@ const AnswerExit = new Autonomous.Exit({
       .describe(
         'KB pages you actually consulted. Use exact titles and URLs from the search results — never invent or modify URLs. Include only pages you cited in your answer. Leave empty [] for greetings and off-topic replies.',
       ),
+    unanswered: z.boolean().default(false).describe('True only when the knowledge base could not answer the user question.'),
+    unansweredQuestion: z.string().optional().describe('The original user question when unanswered is true.'),
   }),
 })
 
@@ -37,10 +43,24 @@ export const Chat = new Conversation({
     }
 
     if (isSimpleGreeting(question)) {
+      const answer = greetingReply()
       await conversation.send({
         type: 'text',
-        payload: { text: greetingReply() },
+        payload: { text: answer },
       })
+      await logConversationTurn({ question, answer, outcome: 'answered', topic: 'getting_started' })
+      return
+    }
+
+    const recentContext = await getRecentConversationContext(question)
+    const scope = checkAdkQuestionScope(question, recentContext)
+    if (!scope.allowed) {
+      const answer = scope.response ?? 'Ask me a Botpress ADK docs question and I can help.'
+      await conversation.send({
+        type: 'text',
+        payload: { text: answer },
+      })
+      await logConversationTurn({ question, answer, outcome: 'unrelated', topic: 'other' })
       return
     }
 
@@ -54,12 +74,18 @@ You help developers build with the Botpress Agent Development Kit (ADK). You ans
 ## Current user question
 Answer this exact question: ${JSON.stringify(question)}
 
+## Recent conversation context
+Use this only to resolve follow-up references in the current question. It is not a source of truth.
+${recentContext || 'No prior conversation context available.'}
+
 ## How to answer
 - Always search the knowledge base before answering. Base your responses only on what you find there.
+- Use recent conversation context to understand follow-up questions, but only answer with information supported by the knowledge base search results.
 - Never make up or guess information. If the knowledge base does not contain the answer, use the reportUnanswered tool and let the user know.
 - Include code examples when they help clarify. Use TypeScript and follow ADK conventions (import from @botpress/runtime, etc.).
 - Keep responses clear and practical. Be friendly but not over-the-top.
 - When relevant, mention which ADK primitive or file location applies (e.g. "this goes in src/tools/").
+- For broad "how do I..." questions, include at most one short code example. Do not append extra pattern examples unless the user explicitly asks for examples, patterns, edge cases, or negative tests.
 - If the knowledge base provides a screenshot URL for a UI feature, include it inline in your answer using markdown: ![description](url).
 - Never link to raw.githubusercontent.com or any skills reference URL. Only link to botpress.com/docs pages.
 - Do not add any "References", "Sources", "Key references used", or similar section at the end of your answer. Source citations are displayed to the user separately.
@@ -67,7 +93,8 @@ Answer this exact question: ${JSON.stringify(question)}
 ## When you don't know
 If you search the knowledge base and cannot find a confident answer:
 1. Call the reportUnanswered tool with the user's question.
-2. Reply with something like: "I don't have a solid answer for that one. I've flagged it for the team — they'll follow up with an answer."
+2. Exit with unanswered=true and unansweredQuestion set to the user's original question.
+3. Keep the answer brief: "I don't have a solid answer for that one. I've flagged it for the team."
 
 ## Scope
 - Only answer questions related to Botpress and the ADK.
@@ -88,6 +115,12 @@ If you search the knowledge base and cannot find a confident answer:
 
     const sources = result.output.usedSources ?? []
     const sourcesTag = sources.length > 0 ? `\n<!--SOURCES:${JSON.stringify(sources)}-->` : ''
-    await conversation.send({ type: 'text', payload: { text: sanitizeAnswer(result.output.answer) + sourcesTag } })
+    const answer = appendRelevantScreenshot(sanitizeAnswer(result.output.answer), question)
+    await conversation.send({ type: 'text', payload: { text: answer + sourcesTag } })
+    await logConversationTurn({
+      question,
+      answer,
+      outcome: result.output.unanswered ? 'unanswered' : 'answered',
+    })
   },
 })

@@ -4,6 +4,12 @@
 const TRAILING_REFERENCE_SECTION =
   /\n+(?:---\s*\n+)?(?:#{1,3}\s+)?(?:\*{0,2})(?:references|sources|key references used|further reading)(?:\*{0,2}):?[\s\S]*$/i
 
+const TRAILING_NEGATIVE_TEST_PATTERN =
+  /\n+(?:test both happy paths and edge\/negative cases:\s*)?```(?:typescript|ts)?\s*[\s\S]*?not_called:\s*['"][^'"]+['"][\s\S]*?```\s*\(?Negative test pattern\)?\s*$/i
+
 export function sanitizeAnswer(answer: string) {
-  return answer.replace(TRAILING_REFERENCE_SECTION, '').trim()
+  return answer
+    .replace(TRAILING_REFERENCE_SECTION, '')
+    .replace(TRAILING_NEGATIVE_TEST_PATTERN, '')
+    .trim()
 }
