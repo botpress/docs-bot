@@ -20,6 +20,6 @@
       "@botpress/runtime/_types/*": ["./.adk/*-types"]
     }
   },
-  "include": ["src/**/*", ".adk/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*", ".adk/*.d.ts"],
+  "exclude": ["node_modules", "dist", ".adk/bot"]
 }

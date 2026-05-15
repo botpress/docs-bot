@@ -5,6 +5,7 @@ import { ALLOWED_PARENT_ORIGINS } from '@/config/constants'
 
 interface ComposerProps {
   onSend: (message: string) => void
+  disabled?: boolean
 }
 
 /**
@@ -12,7 +13,7 @@ interface ComposerProps {
  * padding, send arrow as a circular accent button. Auto-grows up to ~6
  * lines. Centered max-width matches the messages column above.
  */
-export function Composer({ onSend }: ComposerProps) {
+export function Composer({ onSend, disabled = false }: ComposerProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -39,11 +40,12 @@ export function Composer({ onSend }: ComposerProps) {
   }, [value])
 
   const submit = useCallback(() => {
+    if (disabled) return
     const trimmed = value.trim()
     if (!trimmed) return
     onSend(trimmed)
     setValue('')
-  }, [value, onSend])
+  }, [disabled, value, onSend])
 
   const handleKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -57,7 +59,7 @@ export function Composer({ onSend }: ComposerProps) {
     submit()
   }
 
-  const canSend = value.trim().length > 0
+  const canSend = value.trim().length > 0 && !disabled
 
   return (
     <div className="px-5 pb-5 pt-2">
@@ -75,12 +77,14 @@ export function Composer({ onSend }: ComposerProps) {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKey}
+            disabled={disabled}
             rows={1}
-            placeholder="Ask a question..."
+            placeholder={disabled ? 'Waiting for response...' : 'Ask a question...'}
             className={cn(
               'block w-full resize-none bg-transparent outline-none',
               'px-4 pt-3.5 pb-2 text-[14px] leading-6 text-foreground',
               'placeholder:text-muted-foreground/70 font-sans',
+              disabled && 'cursor-not-allowed opacity-70',
             )}
           />
           <div className="flex items-center justify-end px-2 pb-2">
