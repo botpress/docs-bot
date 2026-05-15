@@ -7,6 +7,10 @@ export default defineConfig({
   name: 'Marg',
   description: 'Botpress ADK assistant for the ADK section of the docs (webchat-only)',
 
+  secrets: {
+    CLAUDE_ROUTINE_TOKEN: { description: 'Claude.ai routine API token for new-adk-feedback notifications' },
+  },
+
   defaultModels: {
     autonomous: 'openai:gpt-4.1-2025-04-14',
     zai: 'openai:gpt-4.1-2025-04-14',

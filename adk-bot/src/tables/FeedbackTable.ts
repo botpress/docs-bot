@@ -10,12 +10,13 @@ export const FeedbackTable = new Table({
       searchable: true,
     },
     feedback: {
-      schema: z.string().min(1),
+      schema: z.string(),
       searchable: true,
     },
     reason: z.enum(['unanswered', 'active_conversation']).default('unanswered'),
     userId: z.string(),
     conversationId: z.string(),
+    rating: z.number().min(1).max(5).optional(),
     status: z.enum(['new', 'reviewed', 'dismissed']).default('new'),
   },
 })

@@ -1,4 +1,4 @@
-import { Autonomous, Conversation, z, user, context } from '@botpress/runtime'
+import { Autonomous, Conversation, z, user, context, secrets } from '@botpress/runtime'
 import { WebsiteKB } from '../knowledge'
 import { FeedbackTable } from '../tables/FeedbackTable'
 import { reportUnanswered } from '../tools/reportUnanswered'
@@ -67,24 +67,47 @@ export const Webchat = new Conversation({
 
     if (question.startsWith(FEEDBACK_PREFIX)) {
       try {
-        const { question: origQuestion, feedback, reason } = JSON.parse(question.slice(FEEDBACK_PREFIX.length))
-        if (typeof origQuestion !== 'string' || typeof feedback !== 'string' || !origQuestion.trim() || !feedback.trim()) {
+        const { question: origQuestion, feedback, reason, rating } = JSON.parse(question.slice(FEEDBACK_PREFIX.length))
+        if (typeof origQuestion !== 'string' || !origQuestion.trim()) {
           throw new Error('Invalid feedback payload')
         }
         const feedbackReason: FeedbackReason = reason === 'active_conversation' ? 'active_conversation' : 'unanswered'
+        const parsedRating = typeof rating === 'number' && rating >= 1 && rating <= 5 ? rating : undefined
+        const feedbackText = typeof feedback === 'string' ? feedback.trim() : ''
+        if (!feedbackText && parsedRating === undefined) {
+          throw new Error('Invalid feedback payload')
+        }
         const conv = context.get('conversation', { optional: true })
         await FeedbackTable.createRows({
           rows: [
             {
               question: origQuestion.trim(),
-              feedback: feedback.trim(),
+              feedback: feedbackText,
               reason: feedbackReason,
+              rating: parsedRating,
               userId: user.id,
               conversationId: conv?.id ?? 'unknown',
               status: 'new',
             },
           ],
         })
+        await fetch('https://api.anthropic.com/v1/claude_code/routines/trig_01Khn7iqcNN6EMU6WUNXxXxf/fire', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${secrets.CLAUDE_ROUTINE_TOKEN}`,
+            'anthropic-version': '2023-06-01',
+            'anthropic-beta': 'experimental-cc-routine-2026-04-01',
+          },
+          body: JSON.stringify({
+            text: JSON.stringify({
+              question: origQuestion.trim(),
+              feedback: feedbackText,
+              rating: parsedRating,
+              conversationId: conv?.id ?? 'unknown',
+            }),
+          }),
+        }).catch(() => {})
         await conversation.send({
           type: 'text',
           payload: { text: 'Thanks — your feedback was sent to the ADK docs team.' },

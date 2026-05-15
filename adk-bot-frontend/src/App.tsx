@@ -144,8 +144,18 @@ export default function App() {
     [messages, userId],
   )
 
+  const latestIncomingMessageId = useMemo(
+    () => [...chatMessages].reverse().find((m) => m.direction === 'incoming')?.id,
+    [chatMessages],
+  )
+  const latestIncomingMessageIdRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    latestIncomingMessageIdRef.current = latestIncomingMessageId
+  }, [latestIncomingMessageId])
+
   // Queue messages that arrive before webchat connects; flush when ready.
   const pendingRef = useRef<string[]>([])
+  const pendingBaselineIncomingIdRef = useRef<string | undefined>(undefined)
   const [pendingResponse, setPendingResponse] = useState(false)
 
   const handleSend = useCallback(
@@ -156,6 +166,7 @@ export default function App() {
         return
       }
       if (!text.startsWith('ADK_FEEDBACK:')) {
+        pendingBaselineIncomingIdRef.current = latestIncomingMessageIdRef.current
         setPendingResponse(true)
       }
       void sendMessage({ type: 'text', text }).catch((error) => {
@@ -169,9 +180,9 @@ export default function App() {
   const feedbackPendingRef = useRef(false)
 
   const handleFeedbackSubmit = useCallback(
-    (question: string, feedback: string, reason: 'unanswered' | 'active_conversation') => {
+    (question: string, feedback: string, reason: 'unanswered' | 'active_conversation', rating?: number) => {
       feedbackPendingRef.current = true
-      handleSend(`ADK_FEEDBACK:${JSON.stringify({ question, feedback, reason })}`)
+      handleSend(`ADK_FEEDBACK:${JSON.stringify({ question, feedback, reason, rating })}`)
     },
     [handleSend],
   )
@@ -186,6 +197,7 @@ export default function App() {
     pendingRef.current = []
     for (const text of queue) {
       if (!text.startsWith('ADK_FEEDBACK:')) {
+        pendingBaselineIncomingIdRef.current = latestIncomingMessageIdRef.current
         setPendingResponse(true)
       }
       void sendMessage({ type: 'text', text }).catch((error) => {
@@ -195,13 +207,12 @@ export default function App() {
     }
   }, [conversationId, isReady, sendMessage, status])
 
-  const latestIncomingMessageId = useMemo(
-    () => [...chatMessages].reverse().find((m) => m.direction === 'incoming')?.id,
-    [chatMessages],
-  )
-
   useEffect(() => {
-    if (pendingResponse && latestIncomingMessageId) {
+    if (
+      pendingResponse &&
+      latestIncomingMessageId &&
+      latestIncomingMessageId !== pendingBaselineIncomingIdRef.current
+    ) {
       setPendingResponse(false)
     }
   }, [latestIncomingMessageId, pendingResponse])
@@ -274,7 +285,7 @@ export default function App() {
         )}
       </div>
 
-      <Composer onSend={handleSend} />
+      <Composer onSend={handleSend} disabled={isBusy} />
     </div>
   )
 }

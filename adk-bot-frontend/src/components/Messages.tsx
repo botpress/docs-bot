@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { FeedbackCard } from '@/components/FeedbackCard'
 import { Markdown } from '@/components/Markdown'
 import { SourcesFooter } from '@/components/SourcesFooter'
@@ -24,7 +24,7 @@ interface MessagesProps {
   isThinking: boolean
   thinkingComponent?: React.ReactNode
   conversationId?: string
-  onSubmitFeedback: (question: string, feedback: string, reason: 'unanswered' | 'active_conversation') => void
+  onSubmitFeedback: (question: string, feedback: string, reason: 'unanswered' | 'active_conversation', rating?: number) => void
 }
 
 export function Messages({
@@ -38,20 +38,39 @@ export function Messages({
   const seenRef = useRef<Set<string>>(new Set())
   const lastConvoRef = useRef<string | undefined>(undefined)
   const [streamingId, setStreamingId] = useState<string | undefined>(undefined)
+  const [completedStreamingIds, setCompletedStreamingIds] = useState<Set<string>>(() => new Set())
+  const [hiddenFeedbackIds, setHiddenFeedbackIds] = useState<Set<string>>(() => new Set())
+  const messageElsRef = useRef<Map<string, HTMLDivElement>>(new Map())
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (lastConvoRef.current !== conversationId) {
       lastConvoRef.current = conversationId
       seenRef.current = new Set(messages.map((m) => m.id))
       setStreamingId(undefined)
+      setCompletedStreamingIds(new Set())
+      setHiddenFeedbackIds(new Set())
       return
     }
-    const newIncoming = messages.filter(
-      (m) => m.direction === 'incoming' && !seenRef.current.has(m.id),
-    )
+    const newMsgs = messages.filter((m) => !seenRef.current.has(m.id))
     for (const m of messages) seenRef.current.add(m.id)
-    const latest = newIncoming[newIncoming.length - 1]
-    if (latest) setStreamingId(latest.id)
+
+    const newOutgoing = newMsgs.filter((m) => m.direction === 'outgoing')
+    const newIncoming = newMsgs.filter((m) => m.direction === 'incoming')
+
+    if (newOutgoing.length > 0) {
+      const latest = newOutgoing[newOutgoing.length - 1]
+      messageElsRef.current.get(latest.id)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    const latestIncomingText = [...newIncoming].reverse().find((m) => m.kind === 'text')
+    if (latestIncomingText) {
+      setStreamingId(latestIncomingText.id)
+      setCompletedStreamingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(latestIncomingText.id)
+        return next
+      })
+    }
   }, [messages, conversationId])
 
   const scrollToBottom = useCallback((smooth = false) => {
@@ -61,8 +80,12 @@ export function Messages({
   }, [])
 
   useEffect(() => {
+    const lastMsg = messages[messages.length - 1]
+    const isCurrentStreamDone = !streamingId || completedStreamingIds.has(streamingId)
+    if (lastMsg?.kind === 'feedbackPrompt' && !isCurrentStreamDone) return
+    if (lastMsg?.direction === 'outgoing') return
     scrollToBottom(true)
-  }, [messages, isThinking, scrollToBottom])
+  }, [messages, isThinking, scrollToBottom, streamingId, completedStreamingIds])
 
   const scrollTickRef = useRef(() => scrollToBottom(false))
   useEffect(() => { scrollTickRef.current = () => scrollToBottom(false) }, [scrollToBottom])
@@ -70,15 +93,35 @@ export function Messages({
   return (
     <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-subtle">
       <div className="mx-auto max-w-2xl w-full px-5 py-6 space-y-5">
-        {messages.map((m) => (
-          <MessageRow
-            key={m.id}
-            message={m}
-            animate={m.id === streamingId}
-            scrollTickRef={m.id === streamingId ? scrollTickRef : undefined}
-            onSubmitFeedback={onSubmitFeedback}
-          />
-        ))}
+        {messages.map((m) => {
+          if (
+            m.kind === 'feedbackPrompt' &&
+            (hiddenFeedbackIds.has(m.id) ||
+              (streamingId && !completedStreamingIds.has(streamingId)))
+          ) {
+            return null
+          }
+
+          return (
+            <MessageRow
+              key={m.id}
+              message={m}
+              animate={m.id === streamingId && !completedStreamingIds.has(m.id)}
+              scrollTickRef={m.id === streamingId ? scrollTickRef : undefined}
+              onStreamingComplete={() => {
+                setCompletedStreamingIds((prev) => new Set(prev).add(m.id))
+              }}
+              onHideFeedback={() => {
+                setHiddenFeedbackIds((prev) => new Set(prev).add(m.id))
+              }}
+              onSubmitFeedback={onSubmitFeedback}
+              elRef={(el) => {
+                if (el) messageElsRef.current.set(m.id, el)
+                else messageElsRef.current.delete(m.id)
+              }}
+            />
+          )
+        })}
         {isThinking && thinkingComponent}
       </div>
     </div>
@@ -89,19 +132,33 @@ function MessageRow({
   message,
   animate,
   scrollTickRef,
+  onStreamingComplete,
+  onHideFeedback,
   onSubmitFeedback,
+  elRef,
 }: {
   message: ChatMessage
   animate: boolean
   scrollTickRef?: React.RefObject<() => void>
-  onSubmitFeedback: (question: string, feedback: string, reason: 'unanswered' | 'active_conversation') => void
+  onStreamingComplete: () => void
+  onHideFeedback: () => void
+  onSubmitFeedback: (question: string, feedback: string, reason: 'unanswered' | 'active_conversation', rating?: number) => void
+  elRef?: (el: HTMLDivElement | null) => void
 }) {
   const [streamingDone, setStreamingDone] = useState(false)
 
   if (message.kind === 'feedbackPrompt') {
     return (
       <div className="flex w-full justify-start">
-        <FeedbackCard question={message.question} reason={message.reason} onSubmit={onSubmitFeedback} />
+        <FeedbackCard
+          question={message.question}
+          reason={message.reason}
+          onDismiss={onHideFeedback}
+          onSubmit={(question, feedback, reason, rating) => {
+            onHideFeedback()
+            onSubmitFeedback(question, feedback, reason, rating)
+          }}
+        />
       </div>
     )
   }
@@ -111,7 +168,7 @@ function MessageRow({
 
   if (isUser) {
     return (
-      <div className="flex w-full justify-end">
+      <div ref={elRef} className="flex w-full justify-end">
         <div className="max-w-[85%] rounded-2xl bg-user-bubble text-user-bubble-foreground px-4 py-2.5 text-[14px] leading-6 whitespace-pre-wrap break-words">
           {message.text}
         </div>
@@ -120,13 +177,16 @@ function MessageRow({
   }
 
   return (
-    <div className="flex w-full justify-start">
+    <div ref={elRef} className="flex w-full justify-start">
       <div className="max-w-full break-words">
         {animate ? (
           <StreamingMarkdown
             text={message.text}
             scrollTickRef={scrollTickRef}
-            onComplete={() => setStreamingDone(true)}
+            onComplete={() => {
+              setStreamingDone(true)
+              onStreamingComplete()
+            }}
           />
         ) : (
           <Markdown text={message.text} />
