@@ -1,0 +1,44 @@
+name: Deploy marg-frontend to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'marg-frontend/**'
+
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: marg-frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+        env:
+          # Repo variable to rotate the client ID without a code change; falls back if unset.
+          VITE_CLIENT_ID: ${{ vars.VITE_CLIENT_ID }}
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: marg-frontend/dist
+          destination_dir: marg-frontend
+          keep_files: true
