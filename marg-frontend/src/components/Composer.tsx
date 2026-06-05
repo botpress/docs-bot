@@ -2,6 +2,7 @@ import { useRef, useEffect, useCallback, useState, type FormEvent, type Keyboard
 import { ArrowUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ALLOWED_PARENT_ORIGINS } from '@/config/constants'
+import { rememberParentOrigin } from '@/lib/parentOrigin'
 
 interface ComposerProps {
   onSend: (message: string) => void
@@ -26,6 +27,7 @@ export function Composer({ onSend, disabled = false }: ComposerProps) {
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (!ALLOWED_PARENT_ORIGINS.includes(e.origin)) return
+      rememberParentOrigin(e.origin)
       if (e.data?.type === 'focusInput') textareaRef.current?.focus()
     }
     window.addEventListener('message', handler)

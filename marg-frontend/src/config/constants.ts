@@ -1,5 +1,6 @@
-// marg's webchat client ID (from the bot's Webchat integration in the dashboard).
-export const CLIENT_ID = '50e37fd0-1cd7-4522-a925-e44c4d764f94'
+// marg's webchat client ID. Set VITE_CLIENT_ID at build time to rotate it
+// without a code change; otherwise falls back to the current ID.
+export const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '50e37fd0-1cd7-4522-a925-e44c4d764f94'
 export const WEBCHAT_STORAGE_KEY = `marg-webchat-${CLIENT_ID}`
 
 // Origins allowed to drive this iframe via postMessage. Localhost is included

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { History, Maximize2, Minimize2, PanelRightClose, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getParentOrigin } from '@/lib/parentOrigin'
 
 type LastMessagePayload =
   | { type: 'text'; text?: string }
@@ -117,7 +118,7 @@ export function Header({
 
   const postParent = (type: string) => {
     try {
-      window.parent.postMessage({ type }, '*')
+      window.parent.postMessage({ type }, getParentOrigin())
     } catch {
       /* cross-origin parent without postMessage permission */
     }

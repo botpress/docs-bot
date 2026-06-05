@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { ALLOWED_PARENT_ORIGINS } from '@/config/constants'
+import { rememberParentOrigin } from '@/lib/parentOrigin'
 
 interface ParentMessageData {
   type?: string
@@ -9,9 +10,8 @@ interface ParentMessageData {
 /**
  * Listens for `sendMessage` postMessage events from the docs site's
  * `assistant.js` — text typed into the page's bottom "Ask a question..."
- * input bubble is forwarded into the chat. Other events the parent emits
- * (`panelOpened`, `pageChanged`, `focusInput`) are intentionally ignored:
- * this bot doesn't use page context yet.
+ * input bubble is forwarded into the chat. (Page context is handled separately
+ * by usePageContext, and theme by useThemeFromParent.)
  *
  * Origin is checked against ALLOWED_PARENT_ORIGINS — anything else is dropped.
  */
@@ -19,6 +19,7 @@ export function useParentWindowMessages(onSendMessage: (text: string) => void) {
   useEffect(() => {
     const handler = (event: MessageEvent<ParentMessageData>) => {
       if (!ALLOWED_PARENT_ORIGINS.includes(event.origin)) return
+      rememberParentOrigin(event.origin)
       const data = event.data
       if (!data || typeof data !== 'object') return
 

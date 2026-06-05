@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { ALLOWED_PARENT_ORIGINS } from '@/config/constants'
+import { rememberParentOrigin, getParentOrigin } from '@/lib/parentOrigin'
 
 interface PageMessageData {
   type?: string
@@ -23,6 +24,7 @@ export function usePageContext(onPath: (path: string) => void) {
       if (!data || typeof data !== 'object') return
       if (data.type !== 'panelOpened' && data.type !== 'pageChanged') return
       if (!ALLOWED_PARENT_ORIGINS.includes(event.origin)) return
+      rememberParentOrigin(event.origin)
       const path = data.data?.path
       if (!path || typeof path !== 'string') return
       onPath(path)
@@ -33,7 +35,7 @@ export function usePageContext(onPath: (path: string) => void) {
     // Ask the parent for the current page on mount (assistant.js replies with `panelOpened`).
     if (window.parent !== window) {
       try {
-        window.parent.postMessage({ type: 'requestCurrentPage' }, '*')
+        window.parent.postMessage({ type: 'requestCurrentPage' }, getParentOrigin())
       } catch {
         // ignore — cross-origin parent without postMessage permission
       }

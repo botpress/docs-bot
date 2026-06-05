@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Check, Copy } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getParentOrigin } from '@/lib/parentOrigin'
 
 interface MarkdownProps {
   text: string
@@ -55,7 +56,7 @@ export const Markdown = memo(function Markdown({ text, className }: MarkdownProp
                 if (window.parent !== window) {
                   e.preventDefault()
                   e.stopPropagation()
-                  window.parent.postMessage({ type: 'navigate', url: href }, '*')
+                  window.parent.postMessage({ type: 'navigate', url: href }, getParentOrigin())
                 }
               }}
               target="_blank"

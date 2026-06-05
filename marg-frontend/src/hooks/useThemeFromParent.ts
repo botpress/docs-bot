@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { ALLOWED_PARENT_ORIGINS } from '@/config/constants'
+import { rememberParentOrigin, getParentOrigin } from '@/lib/parentOrigin'
 
 interface ThemeMessage {
   type?: string
@@ -25,6 +26,7 @@ export function useThemeFromParent() {
 
     const handler = (event: MessageEvent<ThemeMessage>) => {
       if (!ALLOWED_PARENT_ORIGINS.includes(event.origin)) return
+      rememberParentOrigin(event.origin)
       const data = event.data
       if (!data || typeof data !== 'object') return
       if (data.type === 'themeChanged' && (data.theme === 'light' || data.theme === 'dark')) {
@@ -38,7 +40,7 @@ export function useThemeFromParent() {
     // this — if not, OS preference (via @media prefers-color-scheme) wins.
     if (window.parent !== window) {
       try {
-        window.parent.postMessage({ type: 'requestTheme' }, '*')
+        window.parent.postMessage({ type: 'requestTheme' }, getParentOrigin())
       } catch {
         // ignore — cross-origin parent without postMessage permission
       }
