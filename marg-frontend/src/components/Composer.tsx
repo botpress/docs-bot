@@ -9,6 +9,12 @@ interface ComposerProps {
   disabled?: boolean
 }
 
+const COMPOSER_BACKGROUND = [
+  'radial-gradient(42% 120% at 0% 0%, color-mix(in srgb, var(--primary) 8%, transparent) 0%, transparent 70%)',
+  'radial-gradient(38% 110% at 100% 100%, color-mix(in srgb, #fb7185 7%, transparent) 0%, transparent 72%)',
+  'hsl(var(--surface))',
+].join(', ')
+
 /**
  * Big rounded card composer at the bottom — soft elevation, generous
  * padding, send arrow as a circular accent button. Auto-grows up to ~6
@@ -67,8 +73,9 @@ export function Composer({ onSend, disabled = false }: ComposerProps) {
     <div className="px-5 pb-5 pt-2">
       <form onSubmit={handleSubmit} className="mx-auto w-full max-w-2xl">
         <div
+          style={{ background: COMPOSER_BACKGROUND }}
           className={cn(
-            'rounded-2xl border border-border bg-surface',
+            'rounded-2xl border border-border',
             'shadow-[0_1px_2px_rgba(0,0,0,0.04)]',
             'focus-within:border-primary focus-within:shadow-[0_2px_8px_rgba(0,0,0,0.06)]',
             'transition-shadow transition-colors',

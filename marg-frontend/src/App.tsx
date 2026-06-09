@@ -241,19 +241,27 @@ export default function App() {
         }}
       >
         {hasMessages ? (
-          <Messages
-            messages={chatMessages}
-            isThinking={isBusy}
-            thinkingComponent={<WorkingIndicator />}
-            conversationId={conversationId}
-            onSend={handleSend}
-          />
+          // Conversation in progress: messages scroll, composer pinned bottom.
+          <>
+            <Messages
+              messages={chatMessages}
+              isThinking={isBusy}
+              thinkingComponent={<WorkingIndicator />}
+              conversationId={conversationId}
+              onSend={handleSend}
+            />
+            <Composer onSend={handleSend} disabled={isBusy} />
+          </>
         ) : (
-          <EmptyState onPick={handleSend} conversationId={conversationId} />
+          // Fresh chat: headline + composer centered in the middle (agent-0
+          // style). On first send it switches to the messages layout above,
+          // dropping the composer to the bottom.
+          <div className="flex-1 flex flex-col justify-center animate-fade-up">
+            <EmptyState />
+            <Composer onSend={handleSend} disabled={isBusy} />
+          </div>
         )}
       </div>
-
-      <Composer onSend={handleSend} disabled={isBusy} />
     </div>
   )
 }
