@@ -1,11 +1,4 @@
-/**
- * Quiet landing — a headline and a one-line scope note, nothing else.
- *
- * Deliberately NO suggested/sample questions: canned prompts skew analytics by
- * funnelling most users into asking the same few questions. (agent-0-style
- * minimal hero; App centers this together with the composer, then the composer
- * drops to the bottom once the conversation starts.)
- */
+// No suggested questions on purpose — canned prompts bias what users ask.
 export function EmptyState() {
   return (
     <div className="text-center px-6 mb-6">

@@ -9,9 +9,6 @@ interface ComposerProps {
   disabled?: boolean
 }
 
-// Subtle layered gradient on the composer shell (adapted from agent-0): a faint
-// blue glow from the top-left + a rose glow from the bottom-right, over the
-// surface base.
 const COMPOSER_BACKGROUND = [
   'radial-gradient(42% 120% at 0% 0%, color-mix(in srgb, var(--primary) 8%, transparent) 0%, transparent 70%)',
   'radial-gradient(38% 110% at 100% 100%, color-mix(in srgb, #fb7185 7%, transparent) 0%, transparent 72%)',
